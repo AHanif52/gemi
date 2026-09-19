@@ -6,6 +6,7 @@ import '../app/theme.dart';
 import '../widgets/baris_gemi.dart';
 import 'transaksi_controller.dart';
 import 'transaksi_model.dart';
+import 'transaksi_ubah_screen.dart';
 
 /// /transaksi — semua transaksi dikelompokkan per tanggal, total harian di header (FR-03).
 class TransaksiListScreen extends StatelessWidget {
@@ -61,7 +62,8 @@ List<Widget> bukuKas(BuildContext context, List<TransaksiBaris> daftar) {
       JenisTransaksi.expense => ('−', g.over),
       JenisTransaksi.transfer => ('', g.ink3),
     };
-    widgets.add(BarisGemi(key: Key('transaksi.${b.t.id}'), judul: b.judul, sub: b.sub, nominal: '$tanda${fmtRupiah(b.t.amount)}', warnaNominal: warna));
+    widgets.add(BarisGemi(key: Key('transaksi.${b.t.id}'), judul: b.judul, sub: b.sub, nominal: '$tanda${fmtRupiah(b.t.amount)}', warnaNominal: warna,
+        onTap: () => Navigator.push(context, MaterialPageRoute(settings: const RouteSettings(name: '/transaksi/ubah'), builder: (_) => TransaksiUbahScreen(b)))));
   }
   return widgets;
 }

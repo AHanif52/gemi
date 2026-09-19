@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 
 import '../app/format.dart';
 import '../app/theme.dart';
+import '../widgets/ribuan_formatter.dart';
 import 'kantong_controller.dart';
 import 'kantong_model.dart';
 
@@ -101,7 +102,7 @@ class _KantongFormScreenState extends State<KantongFormScreen> {
                 key: const Key('kantong.saldo'),
                 controller: _saldo,
                 keyboardType: TextInputType.number,
-                inputFormatters: [FilteringTextInputFormatter.digitsOnly, _RibuanFormatter()],
+                inputFormatters: [FilteringTextInputFormatter.digitsOnly, RibuanFormatter()],
                 style: t.displaySmall?.copyWith(fontFeatures: const [FontFeature.tabularFigures()]),
                 decoration: const InputDecoration(labelText: 'Saldo sekarang', hintText: '0'),
               ),
@@ -126,15 +127,5 @@ class _KantongFormScreenState extends State<KantongFormScreen> {
         ),
       ),
     );
-  }
-}
-
-/// Sisipkan titik ribuan saat mengetik; nilai mentah diambil lewat [parseRupiah].
-class _RibuanFormatter extends TextInputFormatter {
-  @override
-  TextEditingValue formatEditUpdate(TextEditingValue oldValue, TextEditingValue newValue) {
-    if (newValue.text.isEmpty) return newValue;
-    final s = fmtRupiah(parseRupiah(newValue.text));
-    return TextEditingValue(text: s, selection: TextSelection.collapsed(offset: s.length));
   }
 }

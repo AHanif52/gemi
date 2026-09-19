@@ -26,6 +26,9 @@ class TransaksiRepository {
 
   Future<int> tambah(TransactionsCompanion data) => _db.into(_db.transactions).insert(data);
 
+  Future<void> ubah(int id, TransactionsCompanion data) =>
+      (_db.update(_db.transactions)..where((t) => t.id.equals(id))).write(data);
+
   Future<void> hapus(int id) => (_db.delete(_db.transactions)..where((t) => t.id.equals(id))).go();
 
   /// Transaksi terakhir yang dibuat, untuk default kategori & kantong di form (FR-05).

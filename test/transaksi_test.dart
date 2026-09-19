@@ -61,6 +61,19 @@ void main() {
     expect(c.daftar, hasLength(2));
   });
 
+  test('ubah transaksi: saldo dikoreksi dari nilai lama ke baru', () async {
+    final makan = c.kategoriDefault(JenisTransaksi.expense)!;
+    final transport = c.kategori(JenisTransaksi.expense)[1].id;
+    final id = await c.tambah(jenis: JenisTransaksi.expense, nominal: 32000, kantongId: gopay, kategoriId: makan, tanggal: '2026-09-18');
+    await c.ubah(id, jenis: JenisTransaksi.expense, nominal: 25000, kantongId: bca, kategoriId: transport, tanggal: '2026-09-17', catatan: ' Ojek ');
+
+    expect(kantong.saldo(kantong.daftar[0]), 1000000 - 25000);
+    expect(kantong.saldo(kantong.daftar[1]), 50000);
+    expect(c.daftar.single.judul, 'Ojek');
+    expect(c.daftar.single.sub, 'Transport · BCA');
+    expect(c.daftar.single.t.date, '2026-09-17');
+  });
+
   test('validasi: nominal 0, transfer ke kantong sama, tanpa kategori', () async {
     final makan = c.kategoriDefault(JenisTransaksi.expense)!;
     expect(() => c.tambah(jenis: JenisTransaksi.expense, nominal: 0, kantongId: bca, kategoriId: makan, tanggal: '2026-09-18'), throwsArgumentError);

@@ -51,22 +51,54 @@ class TransaksiController extends ChangeNotifier {
     required String tanggal,
     String? catatan,
   }) async {
-    if (nominal <= 0) throw ArgumentError('transaksi.tambah: nominal harus lebih dari 0');
-    final transfer = jenis == JenisTransaksi.transfer;
-    if (transfer && kantongTujuanId == null) throw ArgumentError('transaksi.tambah: transfer butuh kantong tujuan');
-    if (transfer && kantongTujuanId == kantongId) throw ArgumentError('transaksi.tambah: kantong asal dan tujuan sama');
-    if (!transfer && kategoriId == null) throw ArgumentError('transaksi.tambah: kategori wajib dipilih');
-    final id = await _repo.tambah(TransactionsCompanion.insert(
-      type: jenis,
-      amount: nominal,
-      accountId: kantongId,
-      toAccountId: Value(transfer ? kantongTujuanId : null),
-      categoryId: Value(transfer ? null : kategoriId),
-      date: tanggal,
-      note: Value(catatan?.trim().isEmpty == true ? null : catatan?.trim()),
-    ));
+    final id = await _repo.tambah(_susun(
+        aksi: 'tambah', jenis: jenis, nominal: nominal, kantongId: kantongId, kantongTujuanId: kantongTujuanId, kategoriId: kategoriId, tanggal: tanggal, catatan: catatan));
     await _segarkan();
     return id;
+  }
+
+  /// Ubah transaksi yang ada (FR-02). Jenis ikut dikirim karena validasi bergantung padanya.
+  Future<void> ubah(
+    int id, {
+    required JenisTransaksi jenis,
+    required int nominal,
+    required int kantongId,
+    int? kantongTujuanId,
+    int? kategoriId,
+    required String tanggal,
+    String? catatan,
+  }) async {
+    await _repo.ubah(id, _susun(
+        aksi: 'ubah', jenis: jenis, nominal: nominal, kantongId: kantongId, kantongTujuanId: kantongTujuanId, kategoriId: kategoriId, tanggal: tanggal, catatan: catatan));
+    await _segarkan();
+  }
+
+  /// Validasi + bentuk companion. Satu tempat untuk tambah dan ubah.
+  TransactionsCompanion _susun({
+    required String aksi,
+    required JenisTransaksi jenis,
+    required int nominal,
+    required int kantongId,
+    int? kantongTujuanId,
+    int? kategoriId,
+    required String tanggal,
+    String? catatan,
+  }) {
+    if (nominal <= 0) throw ArgumentError('transaksi.$aksi: nominal harus lebih dari 0');
+    final transfer = jenis == JenisTransaksi.transfer;
+    if (transfer && kantongTujuanId == null) throw ArgumentError('transaksi.$aksi: transfer butuh kantong tujuan');
+    if (transfer && kantongTujuanId == kantongId) throw ArgumentError('transaksi.$aksi: kantong asal dan tujuan sama');
+    if (!transfer && kategoriId == null) throw ArgumentError('transaksi.$aksi: kategori wajib dipilih');
+    final note = catatan?.trim();
+    return TransactionsCompanion(
+      type: Value(jenis),
+      amount: Value(nominal),
+      accountId: Value(kantongId),
+      toAccountId: Value(transfer ? kantongTujuanId : null),
+      categoryId: Value(transfer ? null : kategoriId),
+      date: Value(tanggal),
+      note: Value(note == null || note.isEmpty ? null : note),
+    );
   }
 
   Future<void> hapus(int id) async {
