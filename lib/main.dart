@@ -18,6 +18,10 @@ import 'kantong/kantong_screen.dart';
 import 'kategori/kategori_controller.dart';
 import 'kategori/kategori_repository.dart';
 import 'kategori/kategori_screen.dart';
+import 'kunci/kunci_controller.dart';
+import 'kunci/kunci_repository.dart';
+import 'kunci/kunci_screen.dart';
+import 'kunci/pin_screen.dart';
 import 'laporan/laporan_controller.dart';
 import 'laporan/laporan_repository.dart';
 import 'laporan/laporan_screen.dart';
@@ -51,9 +55,10 @@ Future<void> main() async {
   transaksi.addListener(budget.muat);
   final laporan = LaporanController(LaporanRepository(db));
   transaksi.addListener(laporan.muat);
-  final sembunyi = SembunyiController(PengaturanRepository(db))..muat();
-  final tampilan = TampilanController(PengaturanRepository(db))..muat();
-  final pengingat = PengingatController(PengaturanRepository(db));
+  final pengaturanRepo = PengaturanRepository(db);
+  final sembunyi = SembunyiController(pengaturanRepo)..muat();
+  final tampilan = TampilanController(pengaturanRepo)..muat();
+  final pengingat = PengingatController(pengaturanRepo);
   // FR-17: setiap transaksi berubah, jadwal pengingat dihitung ulang.
   bool adaHariIni() => transaksi.daftar.any((b) => b.t.date == hariIni());
   transaksi.addListener(
@@ -63,8 +68,9 @@ Future<void> main() async {
   final backup = BackupController(
     BackupRepository(db),
     BackupService(),
-    PengaturanRepository(db),
+    pengaturanRepo,
   )..muat();
+  final kunci = KunciController(KunciRepository(pengaturanRepo))..muat();
   runApp(
     MultiProvider(
       providers: [
@@ -78,6 +84,7 @@ Future<void> main() async {
         ChangeNotifierProvider.value(value: sembunyi),
         ChangeNotifierProvider.value(value: tampilan),
         ChangeNotifierProvider.value(value: pengingat),
+        ChangeNotifierProvider.value(value: kunci),
       ],
       child: const GemiApp(),
     ),
@@ -112,8 +119,11 @@ class GemiApp extends StatelessWidget {
         '/pengaturan/backup': (_) => const BackupScreen(),
         '/pengaturan/pengingat': (_) => const PengingatScreen(),
         '/pengaturan/tampilan': (_) => const TampilanScreen(),
+        '/pengaturan/kunci': (_) => const KunciScreen(),
       },
       home: const _Gerbang(),
+      // Kunci aplikasi (FR-16): layar PIN menutup semua route selama terkunci.
+      builder: (_, child) => _GerbangKunci(child: child!),
     );
   }
 }
@@ -127,5 +137,20 @@ class _Gerbang extends StatelessWidget {
     final c = context.watch<KantongController>();
     if (!c.siap) return const Scaffold();
     return c.kosong ? const KantongFormScreen(pertama: true) : const Shell();
+  }
+}
+
+/// Tampilkan layar PIN di atas seluruh app selama terkunci; app di bawahnya
+/// tetap hidup (state, route) supaya buka kunci kembali ke tempat semula.
+class _GerbangKunci extends StatelessWidget {
+  const _GerbangKunci({required this.child});
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    final terkunci = context.select<KunciController, bool>(
+      (c) => c.siap && c.terkunci,
+    );
+    return Stack(children: [child, if (terkunci) const PinScreen.buka()]);
   }
 }

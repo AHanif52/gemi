@@ -1,5 +1,6 @@
 package id.gemi.gemi
 
-import io.flutter.embedding.android.FlutterActivity
+import io.flutter.embedding.android.FlutterFragmentActivity
 
-class MainActivity : FlutterActivity()
+// FragmentActivity wajib untuk local_auth (BiometricPrompt).
+class MainActivity : FlutterFragmentActivity()

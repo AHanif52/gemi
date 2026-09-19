@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import '../app/format.dart';
 import '../app/theme.dart';
 import '../widgets/baris_gemi.dart';
+import '../widgets/kosong_gemi.dart';
 import '../widgets/nominal.dart';
 import 'transaksi_controller.dart';
 import 'transaksi_model.dart';
@@ -22,7 +23,12 @@ class TransaksiListScreen extends StatelessWidget {
         actions: const [TombolMata(), SizedBox(width: 12)],
       ),
       body: c.daftar.isEmpty
-          ? const _Kosong()
+          ? const Center(
+              child: KosongGemi(
+                judul: 'Belum ada transaksi',
+                langkah: 'Ketuk + untuk mencatat yang pertama.',
+              ),
+            )
           : ListView(
               padding: const EdgeInsets.symmetric(horizontal: 24),
               children: bukuKas(context, c.daftar),
@@ -98,30 +104,4 @@ List<Widget> bukuKas(BuildContext context, List<TransaksiBaris> daftar) {
     );
   }
   return widgets;
-}
-
-class _Kosong extends StatelessWidget {
-  const _Kosong();
-
-  @override
-  Widget build(BuildContext context) {
-    final g = context.gemi;
-    return Padding(
-      padding: const EdgeInsets.all(32),
-      child: Column(
-        children: [
-          const SizedBox(height: 48),
-          const Text(
-            'Belum ada transaksi',
-            style: TextStyle(fontWeight: FontWeight.w500),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            'Ketuk + untuk mencatat yang pertama.',
-            style: TextStyle(color: g.ink2),
-          ),
-        ],
-      ),
-    );
-  }
 }
