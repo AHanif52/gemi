@@ -230,9 +230,9 @@ class Kantong extends DataClass implements Insertable<Kantong> {
       type: $AccountsTable.$convertertype.fromJson(
         serializer.fromJson<String>(json['type']),
       ),
-      initialBalance: serializer.fromJson<int>(json['initialBalance']),
-      sortOrder: serializer.fromJson<int>(json['sortOrder']),
-      isArchived: serializer.fromJson<bool>(json['isArchived']),
+      initialBalance: serializer.fromJson<int>(json['initial_balance']),
+      sortOrder: serializer.fromJson<int>(json['sort_order']),
+      isArchived: serializer.fromJson<bool>(json['is_archived']),
     );
   }
   @override
@@ -244,9 +244,9 @@ class Kantong extends DataClass implements Insertable<Kantong> {
       'type': serializer.toJson<String>(
         $AccountsTable.$convertertype.toJson(type),
       ),
-      'initialBalance': serializer.toJson<int>(initialBalance),
-      'sortOrder': serializer.toJson<int>(sortOrder),
-      'isArchived': serializer.toJson<bool>(isArchived),
+      'initial_balance': serializer.toJson<int>(initialBalance),
+      'sort_order': serializer.toJson<int>(sortOrder),
+      'is_archived': serializer.toJson<bool>(isArchived),
     };
   }
 
@@ -665,9 +665,9 @@ class Kategori extends DataClass implements Insertable<Kategori> {
         serializer.fromJson<String>(json['type']),
       ),
       color: serializer.fromJson<int>(json['color']),
-      isDefault: serializer.fromJson<bool>(json['isDefault']),
-      isHidden: serializer.fromJson<bool>(json['isHidden']),
-      sortOrder: serializer.fromJson<int>(json['sortOrder']),
+      isDefault: serializer.fromJson<bool>(json['is_default']),
+      isHidden: serializer.fromJson<bool>(json['is_hidden']),
+      sortOrder: serializer.fromJson<int>(json['sort_order']),
     );
   }
   @override
@@ -680,9 +680,9 @@ class Kategori extends DataClass implements Insertable<Kategori> {
         $CategoriesTable.$convertertype.toJson(type),
       ),
       'color': serializer.toJson<int>(color),
-      'isDefault': serializer.toJson<bool>(isDefault),
-      'isHidden': serializer.toJson<bool>(isHidden),
-      'sortOrder': serializer.toJson<int>(sortOrder),
+      'is_default': serializer.toJson<bool>(isDefault),
+      'is_hidden': serializer.toJson<bool>(isHidden),
+      'sort_order': serializer.toJson<int>(sortOrder),
     };
   }
 
@@ -1169,12 +1169,12 @@ class Transaksi extends DataClass implements Insertable<Transaksi> {
         serializer.fromJson<String>(json['type']),
       ),
       amount: serializer.fromJson<int>(json['amount']),
-      accountId: serializer.fromJson<int>(json['accountId']),
-      toAccountId: serializer.fromJson<int?>(json['toAccountId']),
-      categoryId: serializer.fromJson<int?>(json['categoryId']),
+      accountId: serializer.fromJson<int>(json['account_id']),
+      toAccountId: serializer.fromJson<int?>(json['to_account_id']),
+      categoryId: serializer.fromJson<int?>(json['category_id']),
       date: serializer.fromJson<String>(json['date']),
       note: serializer.fromJson<String?>(json['note']),
-      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+      createdAt: serializer.fromJson<DateTime>(json['created_at']),
     );
   }
   @override
@@ -1186,12 +1186,12 @@ class Transaksi extends DataClass implements Insertable<Transaksi> {
         $TransactionsTable.$convertertype.toJson(type),
       ),
       'amount': serializer.toJson<int>(amount),
-      'accountId': serializer.toJson<int>(accountId),
-      'toAccountId': serializer.toJson<int?>(toAccountId),
-      'categoryId': serializer.toJson<int?>(categoryId),
+      'account_id': serializer.toJson<int>(accountId),
+      'to_account_id': serializer.toJson<int?>(toAccountId),
+      'category_id': serializer.toJson<int?>(categoryId),
       'date': serializer.toJson<String>(date),
       'note': serializer.toJson<String?>(note),
-      'createdAt': serializer.toJson<DateTime>(createdAt),
+      'created_at': serializer.toJson<DateTime>(createdAt),
     };
   }
 
@@ -1575,7 +1575,7 @@ class Budget extends DataClass implements Insertable<Budget> {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return Budget(
       id: serializer.fromJson<int>(json['id']),
-      categoryId: serializer.fromJson<int>(json['categoryId']),
+      categoryId: serializer.fromJson<int>(json['category_id']),
       month: serializer.fromJson<String>(json['month']),
       amount: serializer.fromJson<int>(json['amount']),
     );
@@ -1585,7 +1585,7 @@ class Budget extends DataClass implements Insertable<Budget> {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return <String, dynamic>{
       'id': serializer.toJson<int>(id),
-      'categoryId': serializer.toJson<int>(categoryId),
+      'category_id': serializer.toJson<int>(categoryId),
       'month': serializer.toJson<String>(month),
       'amount': serializer.toJson<int>(amount),
     };
@@ -1709,6 +1709,211 @@ class BudgetsCompanion extends UpdateCompanion<Budget> {
   }
 }
 
+class $SettingsTable extends Settings with TableInfo<$SettingsTable, Setelan> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $SettingsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _keyMeta = const VerificationMeta('key');
+  @override
+  late final GeneratedColumn<String> key = GeneratedColumn<String>(
+    'key',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _valueMeta = const VerificationMeta('value');
+  @override
+  late final GeneratedColumn<String> value = GeneratedColumn<String>(
+    'value',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [key, value];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'settings';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<Setelan> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('key')) {
+      context.handle(
+        _keyMeta,
+        key.isAcceptableOrUnknown(data['key']!, _keyMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_keyMeta);
+    }
+    if (data.containsKey('value')) {
+      context.handle(
+        _valueMeta,
+        value.isAcceptableOrUnknown(data['value']!, _valueMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_valueMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {key};
+  @override
+  Setelan map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return Setelan(
+      key: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}key'],
+      )!,
+      value: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}value'],
+      )!,
+    );
+  }
+
+  @override
+  $SettingsTable createAlias(String alias) {
+    return $SettingsTable(attachedDatabase, alias);
+  }
+}
+
+class Setelan extends DataClass implements Insertable<Setelan> {
+  final String key;
+  final String value;
+  const Setelan({required this.key, required this.value});
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['key'] = Variable<String>(key);
+    map['value'] = Variable<String>(value);
+    return map;
+  }
+
+  SettingsCompanion toCompanion(bool nullToAbsent) {
+    return SettingsCompanion(key: Value(key), value: Value(value));
+  }
+
+  factory Setelan.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return Setelan(
+      key: serializer.fromJson<String>(json['key']),
+      value: serializer.fromJson<String>(json['value']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'key': serializer.toJson<String>(key),
+      'value': serializer.toJson<String>(value),
+    };
+  }
+
+  Setelan copyWith({String? key, String? value}) =>
+      Setelan(key: key ?? this.key, value: value ?? this.value);
+  Setelan copyWithCompanion(SettingsCompanion data) {
+    return Setelan(
+      key: data.key.present ? data.key.value : this.key,
+      value: data.value.present ? data.value.value : this.value,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('Setelan(')
+          ..write('key: $key, ')
+          ..write('value: $value')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(key, value);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is Setelan && other.key == this.key && other.value == this.value);
+}
+
+class SettingsCompanion extends UpdateCompanion<Setelan> {
+  final Value<String> key;
+  final Value<String> value;
+  final Value<int> rowid;
+  const SettingsCompanion({
+    this.key = const Value.absent(),
+    this.value = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  SettingsCompanion.insert({
+    required String key,
+    required String value,
+    this.rowid = const Value.absent(),
+  }) : key = Value(key),
+       value = Value(value);
+  static Insertable<Setelan> custom({
+    Expression<String>? key,
+    Expression<String>? value,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (key != null) 'key': key,
+      if (value != null) 'value': value,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  SettingsCompanion copyWith({
+    Value<String>? key,
+    Value<String>? value,
+    Value<int>? rowid,
+  }) {
+    return SettingsCompanion(
+      key: key ?? this.key,
+      value: value ?? this.value,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (key.present) {
+      map['key'] = Variable<String>(key.value);
+    }
+    if (value.present) {
+      map['value'] = Variable<String>(value.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('SettingsCompanion(')
+          ..write('key: $key, ')
+          ..write('value: $value, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$GemiDatabase extends GeneratedDatabase {
   _$GemiDatabase(QueryExecutor e) : super(e);
   $GemiDatabaseManager get managers => $GemiDatabaseManager(this);
@@ -1716,6 +1921,7 @@ abstract class _$GemiDatabase extends GeneratedDatabase {
   late final $CategoriesTable categories = $CategoriesTable(this);
   late final $TransactionsTable transactions = $TransactionsTable(this);
   late final $BudgetsTable budgets = $BudgetsTable(this);
+  late final $SettingsTable settings = $SettingsTable(this);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -1725,6 +1931,7 @@ abstract class _$GemiDatabase extends GeneratedDatabase {
     categories,
     transactions,
     budgets,
+    settings,
   ];
 }
 
@@ -2646,6 +2853,140 @@ typedef $$BudgetsTableProcessedTableManager =
       Budget,
       PrefetchHooks Function()
     >;
+typedef $$SettingsTableCreateCompanionBuilder = SettingsCompanion Function({
+  required String key,
+  required String value,
+  Value<int> rowid,
+});
+typedef $$SettingsTableUpdateCompanionBuilder = SettingsCompanion Function({
+  Value<String> key,
+  Value<String> value,
+  Value<int> rowid,
+});
+
+class $$SettingsTableFilterComposer
+    extends Composer<_$GemiDatabase, $SettingsTable> {
+  $$SettingsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get key => $composableBuilder(
+    column: $table.key,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get value => $composableBuilder(
+    column: $table.value,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$SettingsTableOrderingComposer
+    extends Composer<_$GemiDatabase, $SettingsTable> {
+  $$SettingsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get key => $composableBuilder(
+    column: $table.key,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get value => $composableBuilder(
+    column: $table.value,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$SettingsTableAnnotationComposer
+    extends Composer<_$GemiDatabase, $SettingsTable> {
+  $$SettingsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get key =>
+      $composableBuilder(column: $table.key, builder: (column) => column);
+
+  GeneratedColumn<String> get value =>
+      $composableBuilder(column: $table.value, builder: (column) => column);
+}
+
+class $$SettingsTableTableManager
+    extends
+        RootTableManager<
+          _$GemiDatabase,
+          $SettingsTable,
+          Setelan,
+          $$SettingsTableFilterComposer,
+          $$SettingsTableOrderingComposer,
+          $$SettingsTableAnnotationComposer,
+          $$SettingsTableCreateCompanionBuilder,
+          $$SettingsTableUpdateCompanionBuilder,
+          (Setelan, BaseReferences<_$GemiDatabase, $SettingsTable, Setelan>),
+          Setelan,
+          PrefetchHooks Function()
+        > {
+  $$SettingsTableTableManager(_$GemiDatabase db, $SettingsTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$SettingsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$SettingsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$SettingsTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback: ({
+            Value<String> key = const Value.absent(),
+            Value<String> value = const Value.absent(),
+            Value<int> rowid = const Value.absent(),
+          }) => SettingsCompanion(key: key, value: value, rowid: rowid),
+          createCompanionCallback: ({
+            required String key,
+            required String value,
+            Value<int> rowid = const Value.absent(),
+          }) => SettingsCompanion.insert(key: key, value: value, rowid: rowid),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$SettingsTable, Setelan>(table),
+                  BaseReferences<_$GemiDatabase, $SettingsTable, Setelan>(
+                    db,
+                    table,
+                    e,
+                  ),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$SettingsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$GemiDatabase,
+      $SettingsTable,
+      Setelan,
+      $$SettingsTableFilterComposer,
+      $$SettingsTableOrderingComposer,
+      $$SettingsTableAnnotationComposer,
+      $$SettingsTableCreateCompanionBuilder,
+      $$SettingsTableUpdateCompanionBuilder,
+      (Setelan, BaseReferences<_$GemiDatabase, $SettingsTable, Setelan>),
+      Setelan,
+      PrefetchHooks Function()
+    >;
 
 class $GemiDatabaseManager {
   final _$GemiDatabase _db;
@@ -2658,4 +2999,6 @@ class $GemiDatabaseManager {
       $$TransactionsTableTableManager(_db, _db.transactions);
   $$BudgetsTableTableManager get budgets =>
       $$BudgetsTableTableManager(_db, _db.budgets);
+  $$SettingsTableTableManager get settings =>
+      $$SettingsTableTableManager(_db, _db.settings);
 }

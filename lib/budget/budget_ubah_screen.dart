@@ -117,6 +117,8 @@ class _BudgetUbahScreenState extends State<BudgetUbahScreen> {
                               ),
                               decoration: InputDecoration(
                                 hintText: 'Tanpa budget',
+                                prefixText: 'Rp ',
+                                prefixStyle: TextStyle(color: g.ink2),
                                 isDense: true,
                                 enabledBorder: UnderlineInputBorder(
                                   borderSide: BorderSide(color: g.rule),

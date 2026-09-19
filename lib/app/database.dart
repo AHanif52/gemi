@@ -7,6 +7,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import '../budget/budget_model.dart';
 import '../kantong/kantong_model.dart';
 import '../kategori/kategori_model.dart';
+import '../pengaturan/pengaturan_model.dart';
 import '../transaksi/transaksi_model.dart';
 
 part 'database.g.dart';
@@ -14,7 +15,7 @@ part 'database.g.dart';
 /// Satu database SQLite untuk seluruh app. Tabel didaftarkan per fitur.
 /// Migrasi: naikkan [schemaVersion] dan tambah langkah onUpgrade; mulai berlaku
 /// setelah 0.1 terpasang di HP sungguhan. Sebelum itu, ubah skema = hapus app.
-@DriftDatabase(tables: [Accounts, Categories, Transactions, Budgets])
+@DriftDatabase(tables: [Accounts, Categories, Transactions, Budgets, Settings])
 class GemiDatabase extends _$GemiDatabase {
   /// Untuk test: [executor] in-memory. Produksi lewat [buka].
   GemiDatabase(super.executor);

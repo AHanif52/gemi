@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../app/theme.dart';
+import '../backup/backup_controller.dart';
 import '../kategori/kategori_controller.dart';
 import '../kategori/kategori_model.dart';
 import '../widgets/baris_gemi.dart';
@@ -14,6 +15,7 @@ class PengaturanScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final g = context.gemi;
     final k = context.watch<KategoriController>();
+    final b = context.watch<BackupController>();
     return Scaffold(
       appBar: AppBar(
         leading: TextButton(
@@ -39,10 +41,16 @@ class PengaturanScreen extends StatelessWidget {
                 '${k.aktif(JenisKategori.expense)} pengeluaran · ${k.aktif(JenisKategori.income)} pemasukan',
             onTap: () => Navigator.pushNamed(context, '/pengaturan/kategori'),
           ),
+          BarisTautan(
+            key: const Key('pengaturan.backup'),
+            label: 'Backup & restore',
+            sub: b.keterangan,
+            onTap: () => Navigator.pushNamed(context, '/pengaturan/backup'),
+            tanpaGarisAtas: true,
+          ),
           for (final (nama, key) in [
             ('Pengingat harian', 'pengingat'),
             ('Kunci aplikasi', 'kunci'),
-            ('Backup & restore', 'backup'),
             ('Tampilan', 'tampilan'),
           ])
             Opacity(

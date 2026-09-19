@@ -128,7 +128,10 @@ class _KategoriFormScreenState extends State<KategoriFormScreen> {
                 Wrap(
                   spacing: 8,
                   children: [
-                    for (final j in const [JenisKategori.expense, JenisKategori.income])
+                    for (final j in const [
+                      JenisKategori.expense,
+                      JenisKategori.income,
+                    ])
                       ChoiceChip(
                         key: Key('kategori.jenis.${j.name}'),
                         label: Text(

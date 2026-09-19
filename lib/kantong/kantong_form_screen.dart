@@ -137,9 +137,11 @@ class _KantongFormScreenState extends State<KantongFormScreen> {
                 style: t.displaySmall?.copyWith(
                   fontFeatures: const [FontFeature.tabularFigures()],
                 ),
-                decoration: const InputDecoration(
+                decoration: InputDecoration(
                   labelText: 'Saldo sekarang',
                   hintText: '0',
+                  prefixText: 'Rp ',
+                  prefixStyle: t.titleMedium?.copyWith(color: g.ink2),
                 ),
               ),
               const SizedBox(height: 4),

@@ -60,7 +60,10 @@ class _KategoriScreenState extends State<KategoriScreen> {
             ),
             child: Row(
               children: [
-                for (final j in const [JenisKategori.expense, JenisKategori.income])
+                for (final j in const [
+                  JenisKategori.expense,
+                  JenisKategori.income,
+                ])
                   Padding(
                     padding: const EdgeInsets.only(right: 24),
                     child: InkWell(

@@ -4,6 +4,10 @@ import 'package:provider/provider.dart';
 import 'app/database.dart';
 import 'app/shell.dart';
 import 'app/theme.dart';
+import 'backup/backup_controller.dart';
+import 'backup/backup_repository.dart';
+import 'backup/backup_screen.dart';
+import 'backup/backup_service.dart';
 import 'budget/budget_controller.dart';
 import 'budget/budget_repository.dart';
 import 'kantong/kantong_controller.dart';
@@ -16,6 +20,7 @@ import 'kategori/kategori_screen.dart';
 import 'laporan/laporan_controller.dart';
 import 'laporan/laporan_repository.dart';
 import 'laporan/laporan_screen.dart';
+import 'pengaturan/pengaturan_repository.dart';
 import 'pengaturan/pengaturan_screen.dart';
 import 'transaksi/transaksi_controller.dart';
 import 'transaksi/transaksi_form_screen.dart';
@@ -40,6 +45,11 @@ Future<void> main() async {
   transaksi.addListener(budget.muat);
   final laporan = LaporanController(LaporanRepository(db));
   transaksi.addListener(laporan.muat);
+  final backup = BackupController(
+    BackupRepository(db),
+    BackupService(),
+    PengaturanRepository(db),
+  )..muat();
   runApp(
     MultiProvider(
       providers: [
@@ -49,6 +59,7 @@ Future<void> main() async {
         Provider.value(value: budgetRepo),
         ChangeNotifierProvider.value(value: laporan),
         ChangeNotifierProvider.value(value: kategori),
+        ChangeNotifierProvider.value(value: backup),
       ],
       child: const GemiApp(),
     ),
@@ -79,6 +90,7 @@ class GemiApp extends StatelessWidget {
         '/kantong/baru': (_) => const KantongFormScreen(),
         '/pengaturan': (_) => const PengaturanScreen(),
         '/pengaturan/kategori': (_) => const KategoriScreen(),
+        '/pengaturan/backup': (_) => const BackupScreen(),
       },
       home: const _Gerbang(),
     );

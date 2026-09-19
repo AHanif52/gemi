@@ -134,7 +134,11 @@ class _TransaksiUbahScreenState extends State<TransaksiUbahScreen> {
               style: th.displaySmall?.copyWith(
                 fontFeatures: const [FontFeature.tabularFigures()],
               ),
-              decoration: const InputDecoration(labelText: 'Nominal'),
+              decoration: InputDecoration(
+                labelText: 'Nominal',
+                prefixText: 'Rp ',
+                prefixStyle: th.titleMedium?.copyWith(color: g.ink2),
+              ),
             ),
             if (!_transfer) ...[
               const SizedBox(height: 12),
