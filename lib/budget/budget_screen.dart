@@ -5,6 +5,7 @@ import '../app/format.dart';
 import '../app/theme.dart';
 import '../widgets/bar_budget.dart';
 import '../widgets/hero_gemi.dart';
+import '../widgets/kosong_gemi.dart';
 import 'budget_controller.dart';
 import 'budget_ubah_screen.dart';
 
@@ -54,22 +55,9 @@ class _BudgetScreenState extends State<BudgetScreen> {
           if (d == null)
             const SizedBox(height: 120)
           else if (!d.adaBudget && d.baris.isEmpty)
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 48),
-              child: Column(
-                children: [
-                  const Text(
-                    'Belum ada budget',
-                    style: TextStyle(fontWeight: FontWeight.w500),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    'Tetapkan plafon per kategori supaya sisa terlihat saat mencatat.',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(color: g.ink2),
-                  ),
-                ],
-              ),
+            const KosongGemi(
+              judul: 'Belum ada budget',
+              langkah: 'Tetapkan plafon per kategori supaya sisa terlihat saat mencatat.',
             )
           else ...[
             HeroGemi(
