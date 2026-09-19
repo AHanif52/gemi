@@ -9,6 +9,7 @@ import '../transaksi/transaksi_controller.dart';
 import '../transaksi/transaksi_list_screen.dart';
 import '../widgets/baris_gemi.dart';
 import '../widgets/hero_gemi.dart';
+import '../widgets/nominal.dart';
 
 /// /beranda — sisa budget bulan ini, baris kantong, catatan hari ini dan kemarin.
 class BerandaScreen extends StatelessWidget {
@@ -29,6 +30,7 @@ class BerandaScreen extends StatelessWidget {
       appBar: AppBar(
         title: const Text('Gemi'),
         actions: [
+          const TombolMata(),
           Text(
             fmtTanggalPanjang(DateTime.now()),
             style: TextStyle(fontSize: 13, color: context.gemi.ink2),

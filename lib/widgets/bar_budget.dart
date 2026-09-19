@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../app/format.dart';
 import '../app/theme.dart';
 import '../budget/budget_model.dart';
+import 'nominal.dart';
 
 /// Satu kategori di halaman budget (tokens .budget): nama, terpakai / plafon, bar, catatan.
 /// Bar abu-abu normal, kuning ≥ 80%, merah lewat (FR-08).
@@ -43,27 +44,25 @@ class BarBudget extends StatelessWidget {
               textBaseline: TextBaseline.alphabetic,
               children: [
                 Expanded(child: Text(b.kategori.name)),
-                Text.rich(
-                  TextSpan(
-                    children: [
-                      TextSpan(
-                        text: fmtRupiah(b.pakai),
-                        style: TextStyle(
-                          color: Theme.of(context).colorScheme.onSurface,
-                          fontWeight: FontWeight.w500,
-                        ),
+                Row(
+                  children: [
+                    Nominal(
+                      fmtRupiah(b.pakai),
+                      style: t.bodySmall?.copyWith(
+                        color: Theme.of(context).colorScheme.onSurface,
+                        fontWeight: FontWeight.w500,
                       ),
-                      TextSpan(
-                        text: b.plafon == 0
-                            ? ' · tanpa budget'
-                            : ' / ${fmtRupiah(b.plafon)}',
+                    ),
+                    Text(
+                      b.plafon == 0 ? ' · tanpa budget' : ' / ',
+                      style: t.bodySmall?.copyWith(color: g.ink2),
+                    ),
+                    if (b.plafon > 0)
+                      Nominal(
+                        fmtRupiah(b.plafon),
+                        style: t.bodySmall?.copyWith(color: g.ink2),
                       ),
-                    ],
-                  ),
-                  style: t.bodySmall?.copyWith(
-                    color: g.ink2,
-                    fontFeatures: const [FontFeature.tabularFigures()],
-                  ),
+                  ],
                 ),
               ],
             ),

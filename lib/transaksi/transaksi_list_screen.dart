@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import '../app/format.dart';
 import '../app/theme.dart';
 import '../widgets/baris_gemi.dart';
+import '../widgets/nominal.dart';
 import 'transaksi_controller.dart';
 import 'transaksi_model.dart';
 import 'transaksi_ubah_screen.dart';
@@ -16,7 +17,10 @@ class TransaksiListScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final c = context.watch<TransaksiController>();
     return Scaffold(
-      appBar: AppBar(title: const Text('Transaksi')),
+      appBar: AppBar(
+        title: const Text('Transaksi'),
+        actions: const [TombolMata(), SizedBox(width: 12)],
+      ),
       body: c.daftar.isEmpty
           ? const _Kosong()
           : ListView(
@@ -56,7 +60,7 @@ List<Widget> bukuKas(BuildContext context, List<TransaksiBaris> daftar) {
                 fmtTanggal(tanggal),
                 style: t.bodySmall?.copyWith(color: g.ink2),
               ),
-              Text(
+              Nominal(
                 net > 0 ? '+${fmtRupiah(net)}' : fmtRupiah(net),
                 style: t.bodySmall?.copyWith(
                   color: net > 0
@@ -64,7 +68,6 @@ List<Widget> bukuKas(BuildContext context, List<TransaksiBaris> daftar) {
                       : net < 0
                       ? g.over
                       : g.ink2,
-                  fontFeatures: const [FontFeature.tabularFigures()],
                 ),
               ),
             ],

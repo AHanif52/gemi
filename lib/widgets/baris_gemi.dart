@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../app/theme.dart';
+import 'nominal.dart';
 
 /// Baris buku kas: judul + sub di kiri, nominal tabular di kanan (tokens .row).
 class BarisGemi extends StatelessWidget {
@@ -62,12 +63,9 @@ class BarisGemi extends StatelessWidget {
               ),
             ),
             const SizedBox(width: 12),
-            Text(
+            Nominal(
               nominal,
-              style: t.bodyMedium?.copyWith(
-                fontFeatures: const [FontFeature.tabularFigures()],
-                color: warnaNominal,
-              ),
+              style: t.bodyMedium?.copyWith(color: warnaNominal),
             ),
           ],
         ),
@@ -121,13 +119,7 @@ class BarisTautan extends StatelessWidget {
                 ],
               ),
             ),
-            if (nilai != null)
-              Text(
-                nilai!,
-                style: const TextStyle(
-                  fontFeatures: [FontFeature.tabularFigures()],
-                ),
-              ),
+            if (nilai != null) Nominal(nilai!),
             const SizedBox(width: 12),
             Text(ikon, style: TextStyle(color: g.ink3)),
           ],

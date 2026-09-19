@@ -22,6 +22,7 @@ import 'laporan/laporan_repository.dart';
 import 'laporan/laporan_screen.dart';
 import 'pengaturan/pengaturan_repository.dart';
 import 'pengaturan/pengaturan_screen.dart';
+import 'pengaturan/sembunyi_controller.dart';
 import 'transaksi/transaksi_controller.dart';
 import 'transaksi/transaksi_form_screen.dart';
 import 'transaksi/transaksi_repository.dart';
@@ -45,6 +46,7 @@ Future<void> main() async {
   transaksi.addListener(budget.muat);
   final laporan = LaporanController(LaporanRepository(db));
   transaksi.addListener(laporan.muat);
+  final sembunyi = SembunyiController(PengaturanRepository(db))..muat();
   final backup = BackupController(
     BackupRepository(db),
     BackupService(),
@@ -60,6 +62,7 @@ Future<void> main() async {
         ChangeNotifierProvider.value(value: laporan),
         ChangeNotifierProvider.value(value: kategori),
         ChangeNotifierProvider.value(value: backup),
+        ChangeNotifierProvider.value(value: sembunyi),
       ],
       child: const GemiApp(),
     ),
