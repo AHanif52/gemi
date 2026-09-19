@@ -1,5 +1,8 @@
+import 'dart:math';
+
 import 'package:drift/drift.dart';
 import 'package:drift_flutter/drift_flutter.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 import '../kantong/kantong_model.dart';
 import '../kategori/kategori_model.dart';
@@ -10,10 +13,28 @@ part 'database.g.dart';
 /// Satu database SQLite untuk seluruh app. Tabel didaftarkan per fitur.
 /// Migrasi: naikkan [schemaVersion] dan tambah langkah onUpgrade; mulai berlaku
 /// setelah 0.1 terpasang di HP sungguhan. Sebelum itu, ubah skema = hapus app.
-// ponytail: belum SQLCipher; enkripsi + kunci di Keystore ditambah di langkah keamanan 0.1.
 @DriftDatabase(tables: [Accounts, Categories, Transactions])
 class GemiDatabase extends _$GemiDatabase {
-  GemiDatabase([QueryExecutor? executor]) : super(executor ?? driftDatabase(name: 'gemi'));
+  /// Untuk test: [executor] in-memory. Produksi lewat [buka].
+  GemiDatabase(super.executor);
+
+  /// Buka file DB terenkripsi SQLCipher. Kunci 256-bit acak, dibuat sekali,
+  /// hidup hanya di Keystore/Keychain (BRD: Arsitektur & keamanan).
+  static Future<GemiDatabase> buka() async {
+    final kunci = await _kunciDb();
+    return GemiDatabase(driftDatabase(
+      name: 'gemi',
+      native: DriftNativeOptions(
+        setup: (db) {
+          // Raw key hex: SQLCipher pakai langsung tanpa KDF; bukan passphrase.
+          db.execute("PRAGMA key = \"x'$kunci'\"");
+          if (db.select('PRAGMA cipher_version').isEmpty) {
+            throw StateError('database: SQLCipher tidak aktif, DB tidak terenkripsi');
+          }
+        },
+      ),
+    ));
+  }
 
   @override
   int get schemaVersion => 1;
@@ -33,4 +54,18 @@ class GemiDatabase extends _$GemiDatabase {
           });
         },
       );
+}
+
+/// Kunci DB dari secure storage; dibuat acak kalau belum ada. 64 hex = 32 byte.
+/// resetOnError false: kalau Keystore gagal dibaca, lebih baik error daripada
+/// kunci diganti diam-diam dan seluruh data tidak terbaca.
+Future<String> _kunciDb() async {
+  const storage = FlutterSecureStorage(aOptions: AndroidOptions(resetOnError: false));
+  const nama = 'db_key';
+  final ada = await storage.read(key: nama);
+  if (ada != null) return ada;
+  final r = Random.secure();
+  final baru = List.generate(32, (_) => r.nextInt(256).toRadixString(16).padLeft(2, '0')).join();
+  await storage.write(key: nama, value: baru);
+  return baru;
 }

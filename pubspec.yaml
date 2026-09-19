@@ -37,6 +37,8 @@ dependencies:
   drift: ^2.35.0
   drift_flutter: ^0.3.1
   provider: ^6.1.5+1
+  flutter_secure_storage: ^11.2.0
+  sqlite3: ^3.6.0
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -91,3 +93,9 @@ flutter:
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/to/font-from-package
+
+# Bundel SQLCipher (AES-256) sebagai pengganti SQLite biasa (BRD: Arsitektur & keamanan).
+hooks:
+  user_defines:
+    sqlite3:
+      source: sqlcipher

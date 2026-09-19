@@ -13,8 +13,9 @@ import 'transaksi/transaksi_controller.dart';
 import 'transaksi/transaksi_form_screen.dart';
 import 'transaksi/transaksi_repository.dart';
 
-void main() {
-  final db = GemiDatabase();
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  final db = await GemiDatabase.buka();
   final kantong = KantongController(KantongRepository(db))..muat();
   final transaksi = TransaksiController(TransaksiRepository(db), KategoriRepository(db), kantong)..muat();
   runApp(
