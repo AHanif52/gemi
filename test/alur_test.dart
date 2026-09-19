@@ -44,9 +44,15 @@ Future<void> bukaApp(WidgetTester t) async {
   await t.pumpAndSettle();
 }
 
-/// Toast (SnackBar) tidak hilang sendiri di test; majukan waktu supaya tidak menutup tombol bawah.
+/// Toast (SnackBar) tidak hilang sendiri di test; toast dengan tombol (Batalkan)
+/// bahkan tidak hilang setelah waktu dimajukan, jadi tutup paksa supaya tidak
+/// menutup tombol bawah (Lanjut/Simpan).
 Future<void> tutupToast(WidgetTester t) async {
   await t.pump(const Duration(seconds: 5));
+  final scaffold = find.byType(Scaffold);
+  if (scaffold.evaluate().isNotEmpty) {
+    ScaffoldMessenger.of(t.element(scaffold.first)).clearSnackBars();
+  }
   await t.pumpAndSettle();
 }
 
@@ -298,6 +304,28 @@ void main() {
     await tutupToast(t);
     expect(find.text('Masukkan PIN'), findsNothing);
   });
+  testWidgets('cari transaksi: kata menyaring daftar, tanpa hasil tampil pesan kosong', (t) async {
+    await bukaApp(t);
+    await mulai(t);
+    await tambahPengeluaran(t, '32000', catatan: 'Nasi padang');
+    await tutupToast(t);
+    // Kedua: kategori default = Makan (terakhir dipakai), langsung catatan.
+    await ketuk(t, 'transaksi.tambah');
+    await keypad(t, 'transaksi.keypad', '15000');
+    await ketuk(t, 'transaksi.lanjut');
+    await ketik(t, 'transaksi.catatan', 'Kopi');
+    await ketuk(t, 'transaksi.simpan');
+    await tutupToast(t);
+    await ketuk(t, 'nav.transaksi');
+    await ketuk(t, 'transaksi.cari');
+    expect(find.text('Ketik kata atau pilih rentang tanggal.'), findsOneWidget);
+    await ketik(t, 'transaksi.cari.kata', 'PADANG');
+    expect(find.text('Nasi padang'), findsOneWidget);
+    expect(find.text('Kopi'), findsNothing);
+    await ketik(t, 'transaksi.cari.kata', 'zzz');
+    expect(find.text('Tidak ada yang cocok'), findsOneWidget);
+  });
+
 }
 
 String _bulanIni() {

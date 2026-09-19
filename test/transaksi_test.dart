@@ -6,6 +6,8 @@ import 'package:gemi/kantong/kantong_controller.dart';
 import 'package:gemi/kantong/kantong_model.dart';
 import 'package:gemi/kantong/kantong_repository.dart';
 import 'package:gemi/kategori/kategori_repository.dart';
+import 'package:gemi/laporan/csv_bulanan.dart';
+import 'package:gemi/transaksi/transaksi_cari_screen.dart';
 import 'package:gemi/transaksi/transaksi_controller.dart';
 import 'package:gemi/transaksi/transaksi_model.dart';
 import 'package:gemi/transaksi/transaksi_repository.dart';
@@ -100,6 +102,36 @@ void main() {
 
     await c.hapus(naik!);
     expect(kantong.saldo(k), 940000);
+  });
+
+  test('cari: kata cocok catatan/kategori/kantong tanpa peduli huruf; rentang tanggal inklusif (FR-04)', () async {
+    final makan = c.kategoriDefault(JenisTransaksi.expense)!;
+    final gaji = c.kategoriDefault(JenisTransaksi.income)!;
+    await c.tambah(jenis: JenisTransaksi.expense, nominal: 32000, kantongId: gopay, kategoriId: makan, tanggal: '2026-09-18', catatan: 'Nasi Padang');
+    await c.tambah(jenis: JenisTransaksi.income, nominal: 8500000, kantongId: bca, kategoriId: gaji, tanggal: '2026-09-01');
+    await c.tambah(jenis: JenisTransaksi.transfer, nominal: 100000, kantongId: bca, kantongTujuanId: gopay, tanggal: '2026-08-31');
+
+    List<String> tgl(List<TransaksiBaris> l) => l.map((b) => b.t.date).toList();
+    expect(tgl(cariTransaksi(c.daftar, kata: 'padang')), ['2026-09-18']); // catatan
+    expect(tgl(cariTransaksi(c.daftar, kata: 'gaji')), ['2026-09-01']); // kategori
+    expect(tgl(cariTransaksi(c.daftar, kata: 'gopay')), ['2026-09-18', '2026-08-31']); // kantong + kantong tujuan
+    expect(tgl(cariTransaksi(c.daftar, dari: '2026-09-01', sampai: '2026-09-18')), ['2026-09-18', '2026-09-01']);
+    expect(tgl(cariTransaksi(c.daftar, kata: 'bca', sampai: '2026-08-31')), ['2026-08-31']);
+    expect(cariTransaksi(c.daftar, kata: 'zzz'), isEmpty);
+  });
+
+  test('csv bulanan: hanya bulan itu, urut naik, koma & kutip di-escape (FR-15)', () async {
+    final makan = c.kategoriDefault(JenisTransaksi.expense)!;
+    await c.tambah(jenis: JenisTransaksi.expense, nominal: 32000, kantongId: gopay, kategoriId: makan, tanggal: '2026-09-18', catatan: 'Nasi, "padang"');
+    await c.tambah(jenis: JenisTransaksi.transfer, nominal: 100000, kantongId: bca, kantongTujuanId: gopay, tanggal: '2026-09-02');
+    await c.tambah(jenis: JenisTransaksi.expense, nominal: 5000, kantongId: bca, kategoriId: makan, tanggal: '2026-08-31');
+
+    expect(
+      csvBulanan(c.daftar, '2026-09'),
+      'tanggal,jenis,kategori,kantong,kantong_tujuan,nominal,catatan\r\n'
+      '2026-09-02,Transfer,,BCA,GoPay,100000,\r\n'
+      '2026-09-18,Pengeluaran,Makan,GoPay,,32000,"Nasi, ""padang"""\r\n',
+    );
   });
 
   test('format tanggal', () {

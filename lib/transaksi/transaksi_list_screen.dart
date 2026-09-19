@@ -6,6 +6,7 @@ import '../app/theme.dart';
 import '../widgets/baris_gemi.dart';
 import '../widgets/kosong_gemi.dart';
 import '../widgets/nominal.dart';
+import 'transaksi_cari_screen.dart';
 import 'transaksi_controller.dart';
 import 'transaksi_model.dart';
 import 'transaksi_ubah_screen.dart';
@@ -20,7 +21,22 @@ class TransaksiListScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Transaksi'),
-        actions: const [TombolMata(), SizedBox(width: 12)],
+        actions: [
+          IconButton(
+            key: const Key('transaksi.cari'),
+            tooltip: 'Cari transaksi',
+            onPressed: () => Navigator.push(
+              context,
+              MaterialPageRoute(
+                settings: const RouteSettings(name: '/transaksi/cari'),
+                builder: (_) => const TransaksiCariScreen(),
+              ),
+            ),
+            icon: const Icon(Icons.search),
+          ),
+          const TombolMata(),
+          const SizedBox(width: 12),
+        ],
       ),
       body: c.daftar.isEmpty
           ? const Center(
