@@ -10,16 +10,19 @@ class KantongController extends ChangeNotifier {
   final KantongRepository _repo;
 
   List<Kantong> _daftar = [];
+  Map<int, int> _mutasi = {};
   bool _siap = false;
 
   List<Kantong> get daftar => _daftar;
   bool get siap => _siap;
   bool get kosong => _siap && _daftar.isEmpty;
   int get total => _daftar.fold(0, (a, k) => a + saldo(k));
-  int saldo(Kantong k) => _repo.saldo(k);
+  int saldo(Kantong k) => k.initialBalance + (_mutasi[k.id] ?? 0);
 
+  /// Dipanggil saat mulai dan setiap kali transaksi berubah (saldo ikut berubah).
   Future<void> muat() async {
     _daftar = await _repo.semua();
+    _mutasi = await _repo.mutasi();
     _siap = true;
     notifyListeners();
   }

@@ -2,18 +2,27 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import 'app/database.dart';
+import 'app/shell.dart';
 import 'app/theme.dart';
-import 'beranda/beranda_screen.dart';
 import 'kantong/kantong_controller.dart';
 import 'kantong/kantong_form_screen.dart';
 import 'kantong/kantong_repository.dart';
 import 'kantong/kantong_screen.dart';
+import 'kategori/kategori_repository.dart';
+import 'transaksi/transaksi_controller.dart';
+import 'transaksi/transaksi_form_screen.dart';
+import 'transaksi/transaksi_repository.dart';
 
 void main() {
   final db = GemiDatabase();
+  final kantong = KantongController(KantongRepository(db))..muat();
+  final transaksi = TransaksiController(TransaksiRepository(db), KategoriRepository(db), kantong)..muat();
   runApp(
-    ChangeNotifierProvider(
-      create: (_) => KantongController(KantongRepository(db))..muat(),
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider.value(value: kantong),
+        ChangeNotifierProvider.value(value: transaksi),
+      ],
       child: const GemiApp(),
     ),
   );
@@ -30,7 +39,9 @@ class GemiApp extends StatelessWidget {
       darkTheme: darkTheme,
       // Alamat tetap per layar (BRD: Prinsip UX). Tambah route di sini saat fitur baru masuk.
       routes: {
-        '/beranda': (_) => const BerandaScreen(),
+        '/beranda': (_) => const Shell(),
+        '/transaksi': (_) => const Shell(tab: 1),
+        '/transaksi/baru': (_) => const TransaksiFormScreen(),
         '/mulai': (_) => const KantongFormScreen(pertama: true),
         '/kantong': (_) => const KantongScreen(),
         '/kantong/baru': (_) => const KantongFormScreen(),
@@ -40,7 +51,7 @@ class GemiApp extends StatelessWidget {
   }
 }
 
-/// Layar pertama: tunggu DB, lalu /mulai kalau belum ada kantong, selain itu /beranda.
+/// Layar pertama: tunggu DB, lalu /mulai kalau belum ada kantong, selain itu Beranda.
 class _Gerbang extends StatelessWidget {
   const _Gerbang();
 
@@ -48,6 +59,6 @@ class _Gerbang extends StatelessWidget {
   Widget build(BuildContext context) {
     final c = context.watch<KantongController>();
     if (!c.siap) return const Scaffold();
-    return c.kosong ? const KantongFormScreen(pertama: true) : const BerandaScreen();
+    return c.kosong ? const KantongFormScreen(pertama: true) : const Shell();
   }
 }
