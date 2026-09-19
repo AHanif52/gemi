@@ -2,6 +2,7 @@ import 'package:drift/drift.dart' show Value;
 import 'package:flutter/foundation.dart';
 
 import '../app/database.dart';
+import '../app/format.dart';
 import '../kantong/kantong_controller.dart';
 import '../kategori/kategori_model.dart';
 import '../kategori/kategori_repository.dart';
@@ -133,6 +134,32 @@ class TransaksiController extends ChangeNotifier {
       categoryId: Value(transfer ? null : kategoriId),
       date: Value(tanggal),
       note: Value(note == null || note.isEmpty ? null : note),
+    );
+  }
+
+  /// Penyesuaian saldo (FR-20): selisih saldo riil vs saldo aplikasi dicatat
+  /// sebagai pemasukan/pengeluaran kategori bawaan "Lainnya", catatan
+  /// "Penyesuaian saldo". Kembalikan id (bisa dibatalkan lewat [hapus]);
+  /// null kalau tidak ada selisih.
+  Future<int?> sesuaikanSaldo({
+    required Kantong kantong,
+    required int saldoRiil,
+  }) async {
+    final selisih = saldoRiil - _kantong.saldo(kantong);
+    if (selisih == 0) return null;
+    final masuk = selisih > 0;
+    // Pakai semua(), bukan aktif(): "Lainnya" yang disembunyikan pun tetap
+    // dipakai supaya koreksi selalu tercatat.
+    final lainnya = (await _kategoriRepo.semua(
+      masuk ? JenisKategori.income : JenisKategori.expense,
+    )).firstWhere((k) => k.isDefault && k.name == 'Lainnya');
+    return tambah(
+      jenis: masuk ? JenisTransaksi.income : JenisTransaksi.expense,
+      nominal: selisih.abs(),
+      kantongId: kantong.id,
+      kategoriId: lainnya.id,
+      tanggal: ymd(DateTime.now()),
+      catatan: 'Penyesuaian saldo',
     );
   }
 
