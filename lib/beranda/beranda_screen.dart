@@ -30,7 +30,9 @@ class BerandaScreen extends StatelessWidget {
       appBar: AppBar(
         title: const Text('Gemi'),
         actions: [
-          const TombolMata(),
+          // Mata ikut prototype: di samping angka hero. Kalau belum ada budget
+          // hero tidak punya angka, mata naik ke app bar supaya tetap ada.
+          if (budget != null && !budget.adaBudget) const TombolMata(),
           Text(
             fmtTanggalPanjang(DateTime.now()),
             style: TextStyle(fontSize: 13, color: context.gemi.ink2),
@@ -53,6 +55,7 @@ class BerandaScreen extends StatelessWidget {
             HeroGemi(
               label: 'Sisa budget ${fmtBulan(bulan, pendek: true)}',
               nilai: 'Rp ${fmtRupiah(budget.sisa)}',
+              mata: true,
               delta: budget.sisa < 0
                   ? 'Lewat ${fmtRupiah(-budget.sisa)}'
                   : sisaHari > 0
