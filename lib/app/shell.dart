@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../beranda/beranda_screen.dart';
 import '../budget/budget_screen.dart';
 import '../transaksi/transaksi_list_screen.dart';
+import '../widgets/ikon_gemi.dart';
 import 'theme.dart';
 
 /// Empat tab utama + tombol tambah (BRD: Navigasi utama). Laporan menyusul.
@@ -65,26 +66,22 @@ class _ShellState extends State<Shell> {
           destinations: const [
             NavigationDestination(
               key: Key('nav.beranda'),
-              icon: Icon(Icons.home_outlined),
-              selectedIcon: Icon(Icons.home),
+              icon: IkonTab(IkonGemi.beranda),
               label: 'Beranda',
             ),
             NavigationDestination(
               key: Key('nav.transaksi'),
-              icon: Icon(Icons.list_alt_outlined),
-              selectedIcon: Icon(Icons.list_alt),
+              icon: IkonTab(IkonGemi.transaksi),
               label: 'Transaksi',
             ),
             NavigationDestination(
               key: Key('nav.budget'),
-              icon: Icon(Icons.pie_chart_outline),
-              selectedIcon: Icon(Icons.pie_chart),
+              icon: IkonTab(IkonGemi.budget),
               label: 'Budget',
             ),
             NavigationDestination(
               key: Key('nav.laporan'),
-              icon: Icon(Icons.bar_chart_outlined),
-              selectedIcon: Icon(Icons.bar_chart),
+              icon: IkonTab(IkonGemi.laporan),
               label: 'Laporan',
             ),
           ],
