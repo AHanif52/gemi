@@ -108,8 +108,7 @@ class _KategoriScreenState extends State<KategoriScreen> {
                     : k.isDefault
                     ? 'Bawaan'
                     : 'Kustom',
-                nominal: '›',
-                warnaNominal: g.ink3,
+                ekor: Text('›', style: TextStyle(color: g.ink3)),
                 onTap: () => _buka(k),
               ),
             ),

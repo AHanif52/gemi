@@ -10,16 +10,18 @@ class BarisGemi extends StatelessWidget {
     required this.judul,
     this.sub,
     this.titik,
-    required this.nominal,
+    this.nominal,
     this.warnaNominal,
+    this.ekor,
     this.onTap,
   });
 
   final String judul;
   final String? sub;
   final Color? titik; // dot warna kategori di depan judul
-  final String nominal;
+  final String? nominal; // ikut FR-21 (disembunyikan jadi ••••••)
   final Color? warnaNominal;
+  final Widget? ekor; // pengganti nominal yang bukan uang, mis. chevron
   final VoidCallback? onTap;
 
   @override
@@ -63,10 +65,12 @@ class BarisGemi extends StatelessWidget {
               ),
             ),
             const SizedBox(width: 12),
-            Nominal(
-              nominal,
-              style: t.bodyMedium?.copyWith(color: warnaNominal),
-            ),
+            if (nominal != null)
+              Nominal(
+                nominal!,
+                style: t.bodyMedium?.copyWith(color: warnaNominal),
+              ),
+            ?ekor,
           ],
         ),
       ),

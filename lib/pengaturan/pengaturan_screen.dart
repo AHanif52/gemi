@@ -3,6 +3,8 @@ import 'package:provider/provider.dart';
 
 import '../app/theme.dart';
 import '../backup/backup_controller.dart';
+import '../pengingat/pengingat_controller.dart';
+import '../tampilan/tampilan_controller.dart';
 import '../kategori/kategori_controller.dart';
 import '../kategori/kategori_model.dart';
 import '../widgets/baris_gemi.dart';
@@ -16,6 +18,8 @@ class PengaturanScreen extends StatelessWidget {
     final g = context.gemi;
     final k = context.watch<KategoriController>();
     final b = context.watch<BackupController>();
+    final p = context.watch<PengingatController>();
+    final tm = context.watch<TampilanController>();
     return Scaffold(
       appBar: AppBar(
         leading: TextButton(
@@ -48,11 +52,14 @@ class PengaturanScreen extends StatelessWidget {
             onTap: () => Navigator.pushNamed(context, '/pengaturan/backup'),
             tanpaGarisAtas: true,
           ),
-          for (final (nama, key) in [
-            ('Pengingat harian', 'pengingat'),
-            ('Kunci aplikasi', 'kunci'),
-            ('Tampilan', 'tampilan'),
-          ])
+          BarisTautan(
+            key: const Key('pengaturan.pengingat'),
+            label: 'Pengingat harian',
+            sub: p.keterangan,
+            onTap: () => Navigator.pushNamed(context, '/pengaturan/pengingat'),
+            tanpaGarisAtas: true,
+          ),
+          for (final (nama, key) in [('Kunci aplikasi', 'kunci')])
             Opacity(
               opacity: .5,
               child: BarisTautan(
@@ -63,6 +70,13 @@ class PengaturanScreen extends StatelessWidget {
                 tanpaGarisAtas: true,
               ),
             ),
+          BarisTautan(
+            key: const Key('pengaturan.tampilan'),
+            label: 'Tampilan',
+            sub: tm.keterangan,
+            onTap: () => Navigator.pushNamed(context, '/pengaturan/tampilan'),
+            tanpaGarisAtas: true,
+          ),
           const SizedBox(height: 24),
           Text(
             'Gemi. Tanpa internet, tanpa akun, data di HP ini.',

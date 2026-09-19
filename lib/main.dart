@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import 'app/database.dart';
+import 'app/format.dart';
 import 'app/shell.dart';
 import 'app/theme.dart';
 import 'backup/backup_controller.dart';
@@ -23,6 +24,10 @@ import 'laporan/laporan_screen.dart';
 import 'pengaturan/pengaturan_repository.dart';
 import 'pengaturan/pengaturan_screen.dart';
 import 'pengaturan/sembunyi_controller.dart';
+import 'pengingat/pengingat_controller.dart';
+import 'pengingat/pengingat_screen.dart';
+import 'tampilan/tampilan_controller.dart';
+import 'tampilan/tampilan_screen.dart';
 import 'transaksi/transaksi_controller.dart';
 import 'transaksi/transaksi_form_screen.dart';
 import 'transaksi/transaksi_repository.dart';
@@ -47,6 +52,14 @@ Future<void> main() async {
   final laporan = LaporanController(LaporanRepository(db));
   transaksi.addListener(laporan.muat);
   final sembunyi = SembunyiController(PengaturanRepository(db))..muat();
+  final tampilan = TampilanController(PengaturanRepository(db))..muat();
+  final pengingat = PengingatController(PengaturanRepository(db));
+  // FR-17: setiap transaksi berubah, jadwal pengingat dihitung ulang.
+  bool adaHariIni() => transaksi.daftar.any((b) => b.t.date == hariIni());
+  transaksi.addListener(
+    () => pengingat.jadwalkan(adaTransaksiHariIni: adaHariIni()),
+  );
+  await pengingat.muat();
   final backup = BackupController(
     BackupRepository(db),
     BackupService(),
@@ -63,6 +76,8 @@ Future<void> main() async {
         ChangeNotifierProvider.value(value: kategori),
         ChangeNotifierProvider.value(value: backup),
         ChangeNotifierProvider.value(value: sembunyi),
+        ChangeNotifierProvider.value(value: tampilan),
+        ChangeNotifierProvider.value(value: pengingat),
       ],
       child: const GemiApp(),
     ),
@@ -78,6 +93,7 @@ class GemiApp extends StatelessWidget {
       title: 'Gemi',
       theme: lightTheme,
       darkTheme: darkTheme,
+      themeMode: context.watch<TampilanController>().mode,
       // Alamat tetap per layar (BRD: Prinsip UX). Tambah route di sini saat fitur baru masuk.
       routes: {
         '/beranda': (_) => const Shell(),
@@ -94,6 +110,8 @@ class GemiApp extends StatelessWidget {
         '/pengaturan': (_) => const PengaturanScreen(),
         '/pengaturan/kategori': (_) => const KategoriScreen(),
         '/pengaturan/backup': (_) => const BackupScreen(),
+        '/pengaturan/pengingat': (_) => const PengingatScreen(),
+        '/pengaturan/tampilan': (_) => const TampilanScreen(),
       },
       home: const _Gerbang(),
     );
