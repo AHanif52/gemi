@@ -8,6 +8,7 @@ import '../transaksi/transaksi_controller.dart';
 import '../transaksi/transaksi_list_screen.dart';
 import '../widgets/baris_gemi.dart';
 import '../widgets/hero_gemi.dart';
+import 'csv_bulanan.dart';
 import 'grafik_batang.dart';
 import 'grafik_donat.dart';
 import 'laporan_controller.dart';
@@ -376,6 +377,19 @@ class _Bulan extends StatelessWidget {
             ),
           ),
         ],
+        Padding(
+          padding: const EdgeInsets.only(top: 32),
+          child: BarisGemi(
+            key: const Key('laporan.csv'),
+            judul: 'Ekspor CSV bulan ini',
+            sub: 'Tidak terenkripsi, bisa dibuka di Sheets/Excel',
+            ekor: const Icon(Icons.chevron_right),
+            onTap: () => bagikanCsvBulanan(
+              context.read<TransaksiController>().daftar,
+              bulan,
+            ),
+          ),
+        ),
       ],
     );
   }
