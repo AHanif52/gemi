@@ -47,7 +47,9 @@ class BerandaScreen extends StatelessWidget {
       body: ListView(
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
         children: [
-          if (budget != null && budget.adaBudget)
+          if (budget != null && !budget.adaBudget)
+            _HeroTanpaBudget(bulan: bulan)
+          else if (budget != null)
             HeroGemi(
               label: 'Sisa budget ${fmtBulan(bulan, pendek: true)}',
               nilai: 'Rp ${fmtRupiah(budget.sisa)}',
@@ -65,6 +67,41 @@ class BerandaScreen extends StatelessWidget {
           ),
           ...bukuKas(context, terbaru),
         ],
+      ),
+    );
+  }
+}
+
+/// Hero saat belum ada plafon sama sekali: sebut langkah berikutnya, ketuk ke /budget.
+class _HeroTanpaBudget extends StatelessWidget {
+  const _HeroTanpaBudget({required this.bulan});
+  final String bulan;
+
+  @override
+  Widget build(BuildContext context) {
+    final t = Theme.of(context).textTheme;
+    final g = context.gemi;
+    return InkWell(
+      key: const Key('budget.atur'),
+      onTap: () => Navigator.pushNamed(context, '/budget'),
+      child: Padding(
+        padding: const EdgeInsets.only(top: 16, bottom: 24),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Budget ${fmtBulan(bulan, pendek: true)}',
+              style: t.bodySmall?.copyWith(color: g.ink2),
+            ),
+            const SizedBox(height: 4),
+            Text('Belum diatur', style: t.titleLarge),
+            const SizedBox(height: 8),
+            Text(
+              'Tetapkan plafon per kategori supaya sisa budget tampil di sini ›',
+              style: t.bodySmall?.copyWith(color: g.ink2),
+            ),
+          ],
+        ),
       ),
     );
   }
