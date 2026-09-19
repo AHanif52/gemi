@@ -81,6 +81,27 @@ void main() {
     expect(() => c.tambah(jenis: JenisTransaksi.expense, nominal: 1000, kantongId: bca, tanggal: '2026-09-18'), throwsArgumentError);
   });
 
+  test('penyesuaian saldo: selisih jadi transaksi Lainnya, bisa dibatalkan, tanpa selisih = null (FR-20)', () async {
+    final k = kantong.daftar[0]; // BCA, saldo 1.000.000
+    final turun = await c.sesuaikanSaldo(kantong: k, saldoRiil: 940000);
+    expect(turun, isNotNull);
+    expect(kantong.saldo(k), 940000);
+    final b = c.daftar.firstWhere((b) => b.t.id == turun);
+    expect(b.t.type, JenisTransaksi.expense);
+    expect(b.t.amount, 60000);
+    expect(b.kategori?.name, 'Lainnya');
+    expect(b.t.note, 'Penyesuaian saldo');
+
+    final naik = await c.sesuaikanSaldo(kantong: k, saldoRiil: 1200000);
+    expect(c.daftar.firstWhere((b) => b.t.id == naik).t.type, JenisTransaksi.income);
+    expect(kantong.saldo(k), 1200000);
+
+    expect(await c.sesuaikanSaldo(kantong: k, saldoRiil: 1200000), isNull);
+
+    await c.hapus(naik!);
+    expect(kantong.saldo(k), 940000);
+  });
+
   test('format tanggal', () {
     final now = DateTime(2026, 9, 18);
     expect(fmtTanggal('2026-09-18', sekarang: now), 'Hari ini');
