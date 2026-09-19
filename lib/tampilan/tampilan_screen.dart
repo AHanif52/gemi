@@ -49,6 +49,40 @@ class TampilanScreen extends StatelessWidget {
                 ),
             ],
           ),
+          const SizedBox(height: 32),
+          Text('Minggu dimulai hari', style: t.titleMedium),
+          const SizedBox(height: 4),
+          Text(
+            'Dipakai laporan mingguan dan grafik per hari.',
+            style: t.bodySmall?.copyWith(color: g.ink2),
+          ),
+          const SizedBox(height: 16),
+          Wrap(
+            spacing: 8,
+            children: [
+              for (final (h, label) in [
+                (DateTime.monday, 'Senin'),
+                (DateTime.sunday, 'Minggu'),
+              ])
+                ChoiceChip(
+                  key: Key('tampilan.awalMinggu.$h'),
+                  label: Text(label),
+                  selected: c.awalMinggu == h,
+                  onSelected: (_) => c.setAwalMinggu(h),
+                ),
+            ],
+          ),
+          const SizedBox(height: 32),
+          SwitchListTile(
+            key: const Key('tampilan.layarAman'),
+            contentPadding: EdgeInsets.zero,
+            title: const Text('Blokir screenshot'),
+            subtitle: const Text(
+              'Layar tidak bisa di-screenshot dan tampil hitam di daftar aplikasi terbaru.',
+            ),
+            value: c.layarAman,
+            onChanged: c.setLayarAman,
+          ),
         ],
       ),
     );

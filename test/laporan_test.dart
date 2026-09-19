@@ -65,6 +65,9 @@ void main() {
   test('helper minggu dan ringkas', () {
     expect(ymd(awalMinggu(DateTime(2026, 9, 18))), '2026-09-14'); // Jumat -> Senin
     expect(ymd(awalMinggu(DateTime(2026, 9, 14))), '2026-09-14'); // Senin tetap
+    expect(ymd(awalMinggu(DateTime(2026, 9, 18), hari: DateTime.sunday)), '2026-09-13'); // Jumat -> Minggu
+    expect(ymd(awalMinggu(DateTime(2026, 9, 13), hari: DateTime.sunday)), '2026-09-13'); // Minggu tetap
+    expect(ymd(awalMinggu(DateTime(2026, 9, 14), hari: DateTime.sunday)), '2026-09-13'); // Senin -> Minggu sebelumnya
     expect(fmtRentangMinggu(DateTime(2026, 9, 14)), '14 – 20 Sep');
     expect(fmtRentangMinggu(DateTime(2026, 9, 28)), '28 Sep – 4 Okt');
     expect(fmtRingkas(1240000), '1,2 jt');

@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:gemi/app/database.dart';
+import 'package:gemi/app/format.dart';
 import 'package:gemi/main.dart';
 import 'package:gemi/pengingat/penjadwal.dart';
 
@@ -324,6 +325,23 @@ void main() {
     expect(find.text('Kopi'), findsNothing);
     await ketik(t, 'transaksi.cari.kata', 'zzz');
     expect(find.text('Tidak ada yang cocok'), findsOneWidget);
+  });
+
+  testWidgets('hari awal minggu: ganti ke Minggu menggeser rentang laporan mingguan', (t) async {
+    await bukaApp(t);
+    await mulai(t);
+    await ketuk(t, 'nav.laporan');
+    final now = DateTime.now();
+    expect(find.text(fmtRentangMinggu(awalMinggu(now))), findsOneWidget);
+    await ketuk(t, 'nav.beranda');
+    await ketuk(t, 'pengaturan.buka');
+    await ketuk(t, 'pengaturan.tampilan');
+    await ketuk(t, 'tampilan.awalMinggu.7');
+    expect(find.byKey(const Key('tampilan.layarAman')), findsOneWidget);
+    await kembali(t, '‹ Pengaturan');
+    await kembali(t, '‹ Beranda');
+    await ketuk(t, 'nav.laporan');
+    expect(find.text(fmtRentangMinggu(awalMinggu(now, hari: DateTime.sunday))), findsOneWidget);
   });
 
 }

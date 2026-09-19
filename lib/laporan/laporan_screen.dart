@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import '../app/format.dart';
 import '../app/theme.dart';
 import '../budget/budget_controller.dart';
+import '../tampilan/tampilan_controller.dart';
 import '../transaksi/transaksi_controller.dart';
 import '../transaksi/transaksi_list_screen.dart';
 import '../widgets/baris_gemi.dart';
@@ -28,7 +29,9 @@ class _LaporanScreenState extends State<LaporanScreen> {
   late var _periode = widget.periode;
   // Titik acuan tiap periode disimpan terpisah supaya ganti tab tidak mereset navigasi.
   var _hari = DateTime.now();
-  var _senin = awalMinggu(DateTime.now());
+  // Acuan minggu = sembarang hari di minggu itu; hari pertamanya dihitung di
+  // build dari setelan hari awal minggu supaya ganti setelan langsung terasa.
+  var _minggu = DateTime.now();
   var _bulan = bulanIni();
 
   void _geser(int n) => setState(() {
@@ -36,7 +39,7 @@ class _LaporanScreenState extends State<LaporanScreen> {
       case Periode.hari:
         _hari = _hari.add(Duration(days: n));
       case Periode.minggu:
-        _senin = _senin.add(Duration(days: 7 * n));
+        _minggu = _minggu.add(Duration(days: 7 * n));
       case Periode.bulan:
         _bulan = geserBulan(_bulan, n);
     }
@@ -46,12 +49,16 @@ class _LaporanScreenState extends State<LaporanScreen> {
   Widget build(BuildContext context) {
     final g = context.gemi;
     final ink = Theme.of(context).colorScheme.onSurface;
+    final awal = awalMinggu(
+      _minggu,
+      hari: context.watch<TampilanController>().awalMinggu,
+    );
     final judul = switch (_periode) {
       Periode.hari =>
         fmtTanggal(ymd(_hari)) == 'Hari ini'
             ? 'Hari ini, ${_hari.day} ${fmtBulan(ym(_hari), pendek: true).substring(0, 3)}'
             : fmtTanggal(ymd(_hari)),
-      Periode.minggu => fmtRentangMinggu(_senin),
+      Periode.minggu => fmtRentangMinggu(awal),
       Periode.bulan => fmtBulan(
         _bulan,
         pendek: _bulan.startsWith(bulanIni().substring(0, 4)),
@@ -128,7 +135,7 @@ class _LaporanScreenState extends State<LaporanScreen> {
           ),
           switch (_periode) {
             Periode.hari => _Hari(_hari),
-            Periode.minggu => _Minggu(_senin),
+            Periode.minggu => _Minggu(awal),
             Periode.bulan => _Bulan(_bulan),
           },
           const SizedBox(height: 96),
@@ -173,21 +180,21 @@ class _Hari extends StatelessWidget {
   }
 }
 
-/// FR-10: masuk/keluar, batang per hari Sen–Min, top 5 kategori.
+/// FR-10: masuk/keluar, batang per hari (7 hari dari [awal]), top 5 kategori.
 class _Minggu extends StatelessWidget {
-  const _Minggu(this.senin);
-  final DateTime senin;
+  const _Minggu(this.awal);
+  final DateTime awal;
 
   static const _label = ['Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab', 'Min'];
 
   @override
   Widget build(BuildContext context) {
-    final dari = ymd(senin), sampai = ymd(senin.add(const Duration(days: 6)));
+    final dari = ymd(awal), sampai = ymd(awal.add(const Duration(days: 6)));
     final r = context.watch<LaporanController>().data(dari, sampai);
     if (r == null) return const SizedBox(height: 200);
     final ini = hariIni();
     final hariKe = DateTime.now()
-        .difference(senin)
+        .difference(awal)
         .inDays; // 0..6 kalau minggu ini
     final mingguIni = hariKe >= 0 && hariKe < 7;
     final nilai = <int?>[
@@ -195,7 +202,7 @@ class _Minggu extends StatelessWidget {
         if (mingguIni && i > hariKe)
           null
         else
-          r.keluarPerHari[ymd(senin.add(Duration(days: i)))] ?? 0,
+          r.keluarPerHari[ymd(awal.add(Duration(days: i)))] ?? 0,
     ];
     final hariLewat = mingguIni
         ? hariKe + 1
@@ -213,7 +220,9 @@ class _Minggu extends StatelessWidget {
           ].join(' · '),
         ),
         GrafikBatang(
-          label: _label,
+          label: [
+            for (var i = 0; i < 7; i++) _label[(awal.weekday - 1 + i) % 7],
+          ],
           nilai: nilai,
           hariIni: mingguIni ? hariKe : null,
         ),

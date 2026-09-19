@@ -104,14 +104,14 @@ String fmtRingkas(int n) {
   return '$n';
 }
 
-/// Senin di minggu yang memuat [d].
-DateTime awalMinggu(DateTime d) =>
-    DateTime(d.year, d.month, d.day - (d.weekday - 1));
+/// Hari pertama minggu yang memuat [d]; [hari] = DateTime.monday / sunday (setelan Tampilan).
+DateTime awalMinggu(DateTime d, {int hari = DateTime.monday}) =>
+    DateTime(d.year, d.month, d.day - (d.weekday - hari) % 7);
 
-/// "14 – 20 Sep" atau "29 Sep – 5 Okt" untuk minggu yang dimulai [senin].
-String fmtRentangMinggu(DateTime senin) {
-  final minggu = senin.add(const Duration(days: 6));
-  return senin.month == minggu.month
-      ? '${senin.day} – ${minggu.day} ${_bulan[senin.month - 1]}'
-      : '${senin.day} ${_bulan[senin.month - 1]} – ${minggu.day} ${_bulan[minggu.month - 1]}';
+/// "14 – 20 Sep" atau "29 Sep – 5 Okt" untuk minggu yang dimulai [awal].
+String fmtRentangMinggu(DateTime awal) {
+  final akhir = awal.add(const Duration(days: 6));
+  return awal.month == akhir.month
+      ? '${awal.day} – ${akhir.day} ${_bulan[awal.month - 1]}'
+      : '${awal.day} ${_bulan[awal.month - 1]} – ${akhir.day} ${_bulan[akhir.month - 1]}';
 }
