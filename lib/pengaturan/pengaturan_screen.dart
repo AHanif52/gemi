@@ -5,6 +5,7 @@ import '../app/theme.dart';
 import '../backup/backup_controller.dart';
 import '../kategori/kategori_controller.dart';
 import '../kategori/kategori_model.dart';
+import '../kunci/kunci_controller.dart';
 import '../widgets/baris_gemi.dart';
 
 /// /pengaturan — daftar tautan. Pengingat, kunci, backup, tampilan menyusul di 1.0.
@@ -48,9 +49,15 @@ class PengaturanScreen extends StatelessWidget {
             onTap: () => Navigator.pushNamed(context, '/pengaturan/backup'),
             tanpaGarisAtas: true,
           ),
+          BarisTautan(
+            key: const Key('pengaturan.kunci'),
+            label: 'Kunci aplikasi',
+            sub: context.watch<KunciController>().keterangan,
+            onTap: () => Navigator.pushNamed(context, '/pengaturan/kunci'),
+            tanpaGarisAtas: true,
+          ),
           for (final (nama, key) in [
             ('Pengingat harian', 'pengingat'),
-            ('Kunci aplikasi', 'kunci'),
             ('Tampilan', 'tampilan'),
           ])
             Opacity(

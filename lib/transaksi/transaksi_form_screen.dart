@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import '../app/format.dart';
 import '../app/theme.dart';
 import '../budget/budget_controller.dart';
+import '../widgets/keypad_gemi.dart';
 import '../widgets/pilih_kantong.dart';
 import 'transaksi_controller.dart';
 import 'transaksi_model.dart';
@@ -172,7 +173,7 @@ class _TransaksiFormScreenState extends State<TransaksiFormScreen> {
                   style: t.bodySmall?.copyWith(color: g.ink2),
                 ),
               const Spacer(),
-              _Keypad(onKetik: _ketik),
+              KeypadGemi(onKetik: _ketik, keyPrefix: 'transaksi.keypad'),
               Padding(
                 padding: const EdgeInsets.only(top: 16, bottom: 24),
                 child: FilledButton(
@@ -486,56 +487,6 @@ class _Segmen extends StatelessWidget {
             ),
         ],
       ),
-    );
-  }
-}
-
-class _Keypad extends StatelessWidget {
-  const _Keypad({required this.onKetik});
-  final ValueChanged<String> onKetik;
-
-  static const _tombol = [
-    '1',
-    '2',
-    '3',
-    '4',
-    '5',
-    '6',
-    '7',
-    '8',
-    '9',
-    '000',
-    '0',
-    '⌫',
-  ];
-
-  @override
-  Widget build(BuildContext context) {
-    final surface2 = Theme.of(context).brightness == Brightness.dark
-        ? const Color(0xFF222925)
-        : const Color(0xFFF6F7F5);
-    return GridView.count(
-      crossAxisCount: 3,
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      mainAxisSpacing: 8,
-      crossAxisSpacing: 8,
-      childAspectRatio: 2.1,
-      children: [
-        for (final k in _tombol)
-          Material(
-            color: surface2,
-            borderRadius: BorderRadius.circular(6),
-            child: InkWell(
-              key: Key('transaksi.keypad.$k'),
-              borderRadius: BorderRadius.circular(6),
-              onTap: () => onKetik(k),
-              child: Center(
-                child: Text(k, style: const TextStyle(fontSize: 22)),
-              ),
-            ),
-          ),
-      ],
     );
   }
 }
