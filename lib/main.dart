@@ -10,10 +10,13 @@ import 'kantong/kantong_controller.dart';
 import 'kantong/kantong_form_screen.dart';
 import 'kantong/kantong_repository.dart';
 import 'kantong/kantong_screen.dart';
+import 'kategori/kategori_controller.dart';
 import 'kategori/kategori_repository.dart';
+import 'kategori/kategori_screen.dart';
 import 'laporan/laporan_controller.dart';
 import 'laporan/laporan_repository.dart';
 import 'laporan/laporan_screen.dart';
+import 'pengaturan/pengaturan_screen.dart';
 import 'transaksi/transaksi_controller.dart';
 import 'transaksi/transaksi_form_screen.dart';
 import 'transaksi/transaksi_repository.dart';
@@ -22,11 +25,15 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   final db = await GemiDatabase.buka();
   final kantong = KantongController(KantongRepository(db))..muat();
+  final kategoriRepo = KategoriRepository(db);
+  final kategori = KategoriController(kategoriRepo)..muat();
   final transaksi = TransaksiController(
     TransaksiRepository(db),
-    KategoriRepository(db),
+    kategoriRepo,
     kantong,
   )..muat();
+  // Kategori berubah (nama, warna, disembunyikan) -> form transaksi dan budget ikut.
+  kategori.addListener(transaksi.muat);
   final budgetRepo = BudgetRepository(db);
   final budget = BudgetController(budgetRepo);
   // Terpakai per kategori berubah tiap transaksi berubah.
@@ -41,6 +48,7 @@ Future<void> main() async {
         ChangeNotifierProvider.value(value: budget),
         Provider.value(value: budgetRepo),
         ChangeNotifierProvider.value(value: laporan),
+        ChangeNotifierProvider.value(value: kategori),
       ],
       child: const GemiApp(),
     ),
@@ -69,6 +77,8 @@ class GemiApp extends StatelessWidget {
         '/mulai': (_) => const KantongFormScreen(pertama: true),
         '/kantong': (_) => const KantongScreen(),
         '/kantong/baru': (_) => const KantongFormScreen(),
+        '/pengaturan': (_) => const PengaturanScreen(),
+        '/pengaturan/kategori': (_) => const KategoriScreen(),
       },
       home: const _Gerbang(),
     );

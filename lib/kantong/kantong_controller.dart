@@ -28,7 +28,11 @@ class KantongController extends ChangeNotifier {
   }
 
   /// Nama wajib; lempar [ArgumentError] supaya screen tampilkan pesan, bukan diam.
-  Future<void> tambah({required String nama, required JenisKantong jenis, required int saldoAwal}) async {
+  Future<void> tambah({
+    required String nama,
+    required JenisKantong jenis,
+    required int saldoAwal,
+  }) async {
     final n = nama.trim();
     if (n.isEmpty) throw ArgumentError('kantong.tambah: nama wajib diisi');
     await _repo.tambah(nama: n, jenis: jenis, saldoAwal: saldoAwal);

@@ -15,38 +15,58 @@ class LaporanRepository {
     final n = t.id.count();
     Expression<bool> rentang() => t.date.isBetweenValues(dari, sampai);
 
-    final perJenis = await (_db.selectOnly(t)
-          ..addColumns([t.type, total])
-          ..where(rentang() & t.type.equalsValue(JenisTransaksi.transfer).not())
-          ..groupBy([t.type]))
-        .get();
+    final perJenis =
+        await (_db.selectOnly(t)
+              ..addColumns([t.type, total])
+              ..where(
+                rentang() & t.type.equalsValue(JenisTransaksi.transfer).not(),
+              )
+              ..groupBy([t.type]))
+            .get();
     var masuk = 0, keluar = 0;
     for (final r in perJenis) {
       // selectOnly mengembalikan nilai mentah kolom (String), bukan enum.
-      if (r.read(t.type) == JenisTransaksi.income.name) masuk = r.read(total) ?? 0;
-      if (r.read(t.type) == JenisTransaksi.expense.name) keluar = r.read(total) ?? 0;
+      if (r.read(t.type) == JenisTransaksi.income.name) {
+        masuk = r.read(total) ?? 0;
+      }
+      if (r.read(t.type) == JenisTransaksi.expense.name) {
+        keluar = r.read(total) ?? 0;
+      }
     }
 
-    final perHari = await (_db.selectOnly(t)
-          ..addColumns([t.date, total])
-          ..where(rentang() & t.type.equalsValue(JenisTransaksi.expense))
-          ..groupBy([t.date]))
-        .get();
+    final perHari =
+        await (_db.selectOnly(t)
+              ..addColumns([t.date, total])
+              ..where(rentang() & t.type.equalsValue(JenisTransaksi.expense))
+              ..groupBy([t.date]))
+            .get();
 
-    final perKategori = await (_db.selectOnly(t).join([innerJoin(k, k.id.equalsExp(t.categoryId), useColumns: true)])
-          ..addColumns([total, n])
-          ..where(rentang() & t.type.equalsValue(JenisTransaksi.expense))
-          ..groupBy([k.id])
-          ..orderBy([OrderingTerm.desc(total)]))
-        .get();
+    final perKategori =
+        await (_db.selectOnly(t).join([
+                innerJoin(k, k.id.equalsExp(t.categoryId), useColumns: true),
+              ])
+              ..addColumns([total, n])
+              ..where(rentang() & t.type.equalsValue(JenisTransaksi.expense))
+              ..groupBy([k.id])
+              ..orderBy([OrderingTerm.desc(total)]))
+            .get();
 
     return Ringkasan(
       dari: dari,
       sampai: sampai,
       masuk: masuk,
       keluar: keluar,
-      keluarPerHari: {for (final r in perHari) r.read(t.date)!: r.read(total) ?? 0},
-      keluarPerKategori: [for (final r in perKategori) KategoriTotal(kategori: r.readTable(k), total: r.read(total) ?? 0, jumlah: r.read(n) ?? 0)],
+      keluarPerHari: {
+        for (final r in perHari) r.read(t.date)!: r.read(total) ?? 0,
+      },
+      keluarPerKategori: [
+        for (final r in perKategori)
+          KategoriTotal(
+            kategori: r.readTable(k),
+            total: r.read(total) ?? 0,
+            jumlah: r.read(n) ?? 0,
+          ),
+      ],
     );
   }
 }

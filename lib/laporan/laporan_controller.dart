@@ -15,7 +15,9 @@ class LaporanController extends ChangeNotifier {
   Ringkasan? data(String dari, String sampai) {
     final key = '$dari|$sampai';
     final d = _cache[key];
-    if (d == null && _sedangMuat.add(key)) _muat(dari, sampai).then((_) => _sedangMuat.remove(key));
+    if (d == null && _sedangMuat.add(key)) {
+      _muat(dari, sampai).then((_) => _sedangMuat.remove(key));
+    }
     return d;
   }
 

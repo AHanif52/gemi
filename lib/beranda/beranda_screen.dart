@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../app/format.dart';
+import '../app/theme.dart';
 import '../budget/budget_controller.dart';
 import '../kantong/kantong_controller.dart';
 import '../transaksi/transaksi_controller.dart';
@@ -21,9 +22,26 @@ class BerandaScreen extends StatelessWidget {
     final budget = context.watch<BudgetController>().data(bulan);
     final sisaHari = hariSisa(bulan);
     final kemarin = ymd(DateTime.now().subtract(const Duration(days: 1)));
-    final terbaru = transaksi.daftar.where((b) => b.t.date.compareTo(kemarin) >= 0).toList();
+    final terbaru = transaksi.daftar
+        .where((b) => b.t.date.compareTo(kemarin) >= 0)
+        .toList();
     return Scaffold(
-      appBar: AppBar(title: const Text('Gemi')),
+      appBar: AppBar(
+        title: const Text('Gemi'),
+        actions: [
+          Text(
+            fmtTanggalPanjang(DateTime.now()),
+            style: TextStyle(fontSize: 13, color: context.gemi.ink2),
+          ),
+          IconButton(
+            key: const Key('pengaturan.buka'),
+            tooltip: 'Pengaturan',
+            onPressed: () => Navigator.pushNamed(context, '/pengaturan'),
+            icon: const Icon(Icons.settings_outlined, size: 22),
+          ),
+          const SizedBox(width: 12),
+        ],
+      ),
       body: ListView(
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
         children: [
@@ -34,8 +52,8 @@ class BerandaScreen extends StatelessWidget {
               delta: budget.sisa < 0
                   ? 'Lewat ${fmtRupiah(-budget.sisa)}'
                   : sisaHari > 0
-                      ? '$sisaHari hari lagi · sekitar ${fmtRupiah((budget.sisa / sisaHari / 1000).round() * 1000)} per hari'
-                      : 'Hari terakhir bulan ini',
+                  ? '$sisaHari hari lagi · sekitar ${fmtRupiah((budget.sisa / sisaHari / 1000).round() * 1000)} per hari'
+                  : 'Hari terakhir bulan ini',
             ),
           BarisTautan(
             key: const Key('kantong.lihat'),

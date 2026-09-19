@@ -37,7 +37,8 @@ class _BudgetUbahScreenState extends State<BudgetUbahScreen> {
       _kategori = kategori;
       for (final k in kategori) {
         final p = plafon[k.id] ?? 0;
-        _input[k.id] = TextEditingController(text: p == 0 ? '' : fmtRupiah(p))..addListener(() => setState(() {}));
+        _input[k.id] = TextEditingController(text: p == 0 ? '' : fmtRupiah(p))
+          ..addListener(() => setState(() {}));
       }
     });
   }
@@ -55,7 +56,9 @@ class _BudgetUbahScreenState extends State<BudgetUbahScreen> {
   Future<void> _simpan() async {
     final nav = Navigator.of(context);
     final messenger = ScaffoldMessenger.of(context);
-    await context.read<BudgetController>().simpan(widget.bulan, {for (final e in _input.entries) e.key: parseRupiah(e.value.text)});
+    await context.read<BudgetController>().simpan(widget.bulan, {
+      for (final e in _input.entries) e.key: parseRupiah(e.value.text),
+    });
     nav.pop();
     messenger.showSnackBar(const SnackBar(content: Text('Budget disimpan')));
   }
@@ -66,7 +69,13 @@ class _BudgetUbahScreenState extends State<BudgetUbahScreen> {
     final g = context.gemi;
     final ink = Theme.of(context).colorScheme.onSurface;
     return Scaffold(
-      appBar: AppBar(leading: TextButton(onPressed: () => Navigator.pop(context), child: const Text('Batal')), leadingWidth: 80),
+      appBar: AppBar(
+        leading: TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: const Text('Batal'),
+        ),
+        leadingWidth: 80,
+      ),
       body: SafeArea(
         child: Column(
           children: [
@@ -74,8 +83,17 @@ class _BudgetUbahScreenState extends State<BudgetUbahScreen> {
               child: ListView(
                 padding: const EdgeInsets.symmetric(horizontal: 24),
                 children: [
-                  Padding(padding: const EdgeInsets.only(top: 8, bottom: 4), child: Text('Budget ${fmtBulan(widget.bulan, pendek: true)}', style: t.titleLarge)),
-                  Text('Kosongkan kalau kategori tidak perlu dibatasi.', style: t.bodySmall?.copyWith(color: g.ink2)),
+                  Padding(
+                    padding: const EdgeInsets.only(top: 8, bottom: 4),
+                    child: Text(
+                      'Budget ${fmtBulan(widget.bulan, pendek: true)}',
+                      style: t.titleLarge,
+                    ),
+                  ),
+                  Text(
+                    'Kosongkan kalau kategori tidak perlu dibatasi.',
+                    style: t.bodySmall?.copyWith(color: g.ink2),
+                  ),
                   const SizedBox(height: 16),
                   for (final k in _kategori ?? const <Kategori>[])
                     SizedBox(
@@ -90,13 +108,22 @@ class _BudgetUbahScreenState extends State<BudgetUbahScreen> {
                               controller: _input[k.id],
                               keyboardType: TextInputType.number,
                               textAlign: TextAlign.right,
-                              inputFormatters: [FilteringTextInputFormatter.digitsOnly, RibuanFormatter()],
-                              style: const TextStyle(fontFeatures: [FontFeature.tabularFigures()]),
+                              inputFormatters: [
+                                FilteringTextInputFormatter.digitsOnly,
+                                RibuanFormatter(),
+                              ],
+                              style: const TextStyle(
+                                fontFeatures: [FontFeature.tabularFigures()],
+                              ),
                               decoration: InputDecoration(
                                 hintText: 'Tanpa budget',
                                 isDense: true,
-                                enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: g.rule)),
-                                focusedBorder: UnderlineInputBorder(borderSide: BorderSide(color: ink)),
+                                enabledBorder: UnderlineInputBorder(
+                                  borderSide: BorderSide(color: g.rule),
+                                ),
+                                focusedBorder: UnderlineInputBorder(
+                                  borderSide: BorderSide(color: ink),
+                                ),
                               ),
                             ),
                           ),
@@ -107,11 +134,32 @@ class _BudgetUbahScreenState extends State<BudgetUbahScreen> {
                   Container(
                     margin: const EdgeInsets.only(top: 8),
                     padding: const EdgeInsets.symmetric(vertical: 12),
-                    decoration: BoxDecoration(border: Border(top: BorderSide(color: ink), bottom: BorderSide(color: ink, width: 3, style: BorderStyle.solid))),
+                    decoration: BoxDecoration(
+                      border: Border(
+                        top: BorderSide(color: ink),
+                        bottom: BorderSide(
+                          color: ink,
+                          width: 3,
+                          style: BorderStyle.solid,
+                        ),
+                      ),
+                    ),
                     child: Row(
                       children: [
-                        const Expanded(child: Text('Total budget', style: TextStyle(fontWeight: FontWeight.w600))),
-                        Text(fmtRupiah(_total), key: const Key('budget.total'), style: const TextStyle(fontWeight: FontWeight.w600, fontFeatures: [FontFeature.tabularFigures()])),
+                        const Expanded(
+                          child: Text(
+                            'Total budget',
+                            style: TextStyle(fontWeight: FontWeight.w600),
+                          ),
+                        ),
+                        Text(
+                          fmtRupiah(_total),
+                          key: const Key('budget.total'),
+                          style: const TextStyle(
+                            fontWeight: FontWeight.w600,
+                            fontFeatures: [FontFeature.tabularFigures()],
+                          ),
+                        ),
                       ],
                     ),
                   ),
@@ -120,7 +168,11 @@ class _BudgetUbahScreenState extends State<BudgetUbahScreen> {
             ),
             Padding(
               padding: const EdgeInsets.fromLTRB(24, 8, 24, 24),
-              child: FilledButton(key: const Key('budget.simpan'), onPressed: _kategori == null ? null : _simpan, child: const Text('Simpan budget')),
+              child: FilledButton(
+                key: const Key('budget.simpan'),
+                onPressed: _kategori == null ? null : _simpan,
+                child: const Text('Simpan budget'),
+              ),
             ),
           ],
         ),

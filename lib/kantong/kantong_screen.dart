@@ -20,7 +20,12 @@ class KantongScreen extends StatelessWidget {
         children: [
           HeroGemi(label: 'Semua kantong', nilai: 'Rp ${fmtRupiah(c.total)}'),
           for (final k in c.daftar)
-            BarisGemi(key: Key('kantong.${k.id}'), judul: k.name, sub: k.type.label, nominal: fmtRupiah(c.saldo(k))),
+            BarisGemi(
+              key: Key('kantong.${k.id}'),
+              judul: k.name,
+              sub: k.type.label,
+              nominal: fmtRupiah(c.saldo(k)),
+            ),
           BarisTautan(
             key: const Key('kantong.tambah'),
             label: 'Tambah kantong',

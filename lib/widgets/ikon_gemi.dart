@@ -12,9 +12,12 @@ class IkonTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => CustomPaint(
-        size: Size.square(ukuran),
-        painter: _Painter(ikon, warna ?? IconTheme.of(context).color ?? Colors.black),
-      );
+    size: Size.square(ukuran),
+    painter: _Painter(
+      ikon,
+      warna ?? IconTheme.of(context).color ?? Colors.black,
+    ),
+  );
 }
 
 class _Painter extends CustomPainter {
@@ -34,13 +37,28 @@ class _Painter extends CustomPainter {
     canvas.scale(s);
     switch (ikon) {
       case IkonGemi.beranda: // M4 11 12 4l8 7v9H4z
-        canvas.drawPath(Path()..moveTo(4, 11)..lineTo(12, 4)..lineTo(20, 11)..lineTo(20, 20)..lineTo(4, 20)..close(), p);
+        canvas.drawPath(
+          Path()
+            ..moveTo(4, 11)
+            ..lineTo(12, 4)
+            ..lineTo(20, 11)
+            ..lineTo(20, 20)
+            ..lineTo(4, 20)
+            ..close(),
+          p,
+        );
       case IkonGemi.transaksi: // M5 6h14M5 12h14M5 18h9
         canvas.drawLine(const Offset(5, 6), const Offset(19, 6), p);
         canvas.drawLine(const Offset(5, 12), const Offset(19, 12), p);
         canvas.drawLine(const Offset(5, 18), const Offset(14, 18), p);
       case IkonGemi.budget: // rect 4,5 16x14 rx2 + M4 11h16
-        canvas.drawRRect(RRect.fromRectAndRadius(const Rect.fromLTWH(4, 5, 16, 14), const Radius.circular(2)), p);
+        canvas.drawRRect(
+          RRect.fromRectAndRadius(
+            const Rect.fromLTWH(4, 5, 16, 14),
+            const Radius.circular(2),
+          ),
+          p,
+        );
         canvas.drawLine(const Offset(4, 11), const Offset(20, 11), p);
       case IkonGemi.laporan: // M5 19V9M12 19V5M19 19v-8
         canvas.drawLine(const Offset(5, 19), const Offset(5, 9), p);

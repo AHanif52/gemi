@@ -31,24 +31,30 @@ class _LaporanScreenState extends State<LaporanScreen> {
   var _bulan = bulanIni();
 
   void _geser(int n) => setState(() {
-        switch (_periode) {
-          case Periode.hari:
-            _hari = _hari.add(Duration(days: n));
-          case Periode.minggu:
-            _senin = _senin.add(Duration(days: 7 * n));
-          case Periode.bulan:
-            _bulan = geserBulan(_bulan, n);
-        }
-      });
+    switch (_periode) {
+      case Periode.hari:
+        _hari = _hari.add(Duration(days: n));
+      case Periode.minggu:
+        _senin = _senin.add(Duration(days: 7 * n));
+      case Periode.bulan:
+        _bulan = geserBulan(_bulan, n);
+    }
+  });
 
   @override
   Widget build(BuildContext context) {
     final g = context.gemi;
     final ink = Theme.of(context).colorScheme.onSurface;
     final judul = switch (_periode) {
-      Periode.hari => fmtTanggal(ymd(_hari)) == 'Hari ini' ? 'Hari ini, ${_hari.day} ${fmtBulan(ym(_hari), pendek: true).substring(0, 3)}' : fmtTanggal(ymd(_hari)),
+      Periode.hari =>
+        fmtTanggal(ymd(_hari)) == 'Hari ini'
+            ? 'Hari ini, ${_hari.day} ${fmtBulan(ym(_hari), pendek: true).substring(0, 3)}'
+            : fmtTanggal(ymd(_hari)),
       Periode.minggu => fmtRentangMinggu(_senin),
-      Periode.bulan => fmtBulan(_bulan, pendek: _bulan.startsWith(bulanIni().substring(0, 4))),
+      Periode.bulan => fmtBulan(
+        _bulan,
+        pendek: _bulan.startsWith(bulanIni().substring(0, 4)),
+      ),
     };
     return Scaffold(
       appBar: AppBar(title: const Text('Laporan')),
@@ -56,7 +62,9 @@ class _LaporanScreenState extends State<LaporanScreen> {
         padding: const EdgeInsets.symmetric(horizontal: 24),
         children: [
           Container(
-            decoration: BoxDecoration(border: Border(bottom: BorderSide(color: g.rule))),
+            decoration: BoxDecoration(
+              border: Border(bottom: BorderSide(color: g.rule)),
+            ),
             child: Row(
               children: [
                 for (final p in Periode.values)
@@ -68,10 +76,24 @@ class _LaporanScreenState extends State<LaporanScreen> {
                       child: Container(
                         height: 40,
                         alignment: Alignment.center,
-                        decoration: BoxDecoration(border: Border(bottom: BorderSide(color: p == _periode ? ink : Colors.transparent, width: 2))),
+                        decoration: BoxDecoration(
+                          border: Border(
+                            bottom: BorderSide(
+                              color: p == _periode ? ink : Colors.transparent,
+                              width: 2,
+                            ),
+                          ),
+                        ),
                         child: Text(
-                          switch (p) { Periode.hari => 'Hari', Periode.minggu => 'Minggu', Periode.bulan => 'Bulan' },
-                          style: TextStyle(color: p == _periode ? ink : g.ink2, fontWeight: p == _periode ? FontWeight.w500 : null),
+                          switch (p) {
+                            Periode.hari => 'Hari',
+                            Periode.minggu => 'Minggu',
+                            Periode.bulan => 'Bulan',
+                          },
+                          style: TextStyle(
+                            color: p == _periode ? ink : g.ink2,
+                            fontWeight: p == _periode ? FontWeight.w500 : null,
+                          ),
                         ),
                       ),
                     ),
@@ -83,9 +105,23 @@ class _LaporanScreenState extends State<LaporanScreen> {
             padding: const EdgeInsets.only(top: 12),
             child: Row(
               children: [
-                IconButton(key: const Key('laporan.sebelumnya'), onPressed: () => _geser(-1), icon: const Icon(Icons.chevron_left)),
-                Expanded(child: Text(judul, textAlign: TextAlign.center, style: const TextStyle(fontWeight: FontWeight.w500))),
-                IconButton(key: const Key('laporan.berikutnya'), onPressed: () => _geser(1), icon: const Icon(Icons.chevron_right)),
+                IconButton(
+                  key: const Key('laporan.sebelumnya'),
+                  onPressed: () => _geser(-1),
+                  icon: const Icon(Icons.chevron_left),
+                ),
+                Expanded(
+                  child: Text(
+                    judul,
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(fontWeight: FontWeight.w500),
+                  ),
+                ),
+                IconButton(
+                  key: const Key('laporan.berikutnya'),
+                  onPressed: () => _geser(1),
+                  icon: const Icon(Icons.chevron_right),
+                ),
               ],
             ),
           ),
@@ -110,7 +146,11 @@ class _Hari extends StatelessWidget {
   Widget build(BuildContext context) {
     final tgl = ymd(hari);
     final r = context.watch<LaporanController>().data(tgl, tgl);
-    final daftar = context.watch<TransaksiController>().daftar.where((b) => b.t.date == tgl).toList();
+    final daftar = context
+        .watch<TransaksiController>()
+        .daftar
+        .where((b) => b.t.date == tgl)
+        .toList();
     if (r == null) return const SizedBox(height: 200);
     final ini = tgl == hariIni();
     return Column(
@@ -119,9 +159,14 @@ class _Hari extends StatelessWidget {
         HeroGemi(
           label: ini ? 'Keluar hari ini' : 'Keluar',
           nilai: 'Rp ${fmtRupiah(r.keluar)}',
-          delta: r.masuk > 0 ? 'Masuk ${fmtRupiah(r.masuk)} · selisih ${fmtRupiah(r.selisih)}' : 'Belum ada pemasukan${ini ? ' hari ini' : ''}',
+          delta: r.masuk > 0
+              ? 'Masuk ${fmtRupiah(r.masuk)} · selisih ${fmtRupiah(r.selisih)}'
+              : 'Belum ada pemasukan${ini ? ' hari ini' : ''}',
         ),
-        if (daftar.isEmpty) Text('Tidak ada catatan.', style: TextStyle(color: context.gemi.ink2)) else ...bukuKas(context, daftar),
+        if (daftar.isEmpty)
+          Text('Tidak ada catatan.', style: TextStyle(color: context.gemi.ink2))
+        else
+          ...bukuKas(context, daftar),
       ],
     );
   }
@@ -140,13 +185,20 @@ class _Minggu extends StatelessWidget {
     final r = context.watch<LaporanController>().data(dari, sampai);
     if (r == null) return const SizedBox(height: 200);
     final ini = hariIni();
-    final hariKe = DateTime.now().difference(senin).inDays; // 0..6 kalau minggu ini
+    final hariKe = DateTime.now()
+        .difference(senin)
+        .inDays; // 0..6 kalau minggu ini
     final mingguIni = hariKe >= 0 && hariKe < 7;
     final nilai = <int?>[
       for (var i = 0; i < 7; i++)
-        if (mingguIni && i > hariKe) null else r.keluarPerHari[ymd(senin.add(Duration(days: i)))] ?? 0,
+        if (mingguIni && i > hariKe)
+          null
+        else
+          r.keluarPerHari[ymd(senin.add(Duration(days: i)))] ?? 0,
     ];
-    final hariLewat = mingguIni ? hariKe + 1 : (dari.compareTo(ini) > 0 ? 0 : 7);
+    final hariLewat = mingguIni
+        ? hariKe + 1
+        : (dari.compareTo(ini) > 0 ? 0 : 7);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -154,14 +206,28 @@ class _Minggu extends StatelessWidget {
           label: mingguIni ? 'Keluar minggu ini' : 'Keluar',
           nilai: 'Rp ${fmtRupiah(r.keluar)}',
           delta: [
-            if (hariLewat > 0) 'Rata-rata ${fmtRupiah((r.keluar / hariLewat / 1000).round() * 1000)} per hari',
+            if (hariLewat > 0)
+              'Rata-rata ${fmtRupiah((r.keluar / hariLewat / 1000).round() * 1000)} per hari',
             r.masuk > 0 ? 'masuk ${fmtRupiah(r.masuk)}' : 'belum ada pemasukan',
           ].join(' · '),
         ),
-        GrafikBatang(label: _label, nilai: nilai, hariIni: mingguIni ? hariKe : null),
+        GrafikBatang(
+          label: _label,
+          nilai: nilai,
+          hariIni: mingguIni ? hariKe : null,
+        ),
         _Judul('Kategori terbesar'),
-        if (r.keluarPerKategori.isEmpty) Text('Belum ada pengeluaran.', style: TextStyle(color: context.gemi.ink2)),
-        for (final k in r.keluarPerKategori.take(5)) BarisGemi(judul: k.kategori.name, sub: '${k.jumlah} catatan', nominal: fmtRupiah(k.total)),
+        if (r.keluarPerKategori.isEmpty)
+          Text(
+            'Belum ada pengeluaran.',
+            style: TextStyle(color: context.gemi.ink2),
+          ),
+        for (final k in r.keluarPerKategori.take(5))
+          BarisGemi(
+            judul: k.kategori.name,
+            sub: '${k.jumlah} catatan',
+            nominal: fmtRupiah(k.total),
+          ),
       ],
     );
   }
@@ -176,9 +242,17 @@ class _Bulan extends StatelessWidget {
   Widget build(BuildContext context) {
     final g = context.gemi;
     final ink = Theme.of(context).colorScheme.onSurface;
-    final akhir = DateTime(int.parse(bulan.substring(0, 4)), int.parse(bulan.substring(5, 7)) + 1, 0).day;
+    final akhir = DateTime(
+      int.parse(bulan.substring(0, 4)),
+      int.parse(bulan.substring(5, 7)) + 1,
+      0,
+    ).day;
     final lalu = geserBulan(bulan, -1);
-    final akhirLalu = DateTime(int.parse(lalu.substring(0, 4)), int.parse(lalu.substring(5, 7)) + 1, 0).day;
+    final akhirLalu = DateTime(
+      int.parse(lalu.substring(0, 4)),
+      int.parse(lalu.substring(5, 7)) + 1,
+      0,
+    ).day;
     final laporan = context.watch<LaporanController>();
     final r = laporan.data('$bulan-01', '$bulan-$akhir');
     final rLalu = laporan.data('$lalu-01', '$lalu-$akhirLalu');
@@ -189,17 +263,23 @@ class _Bulan extends StatelessWidget {
     final hariKe = DateTime.now().day; // dipakai hanya kalau bulan ini
     // Batang per minggu kalender: 1–7, 8–14, 15–21, 22–akhir.
     final batas = [1, 8, 15, 22, akhir + 1];
-    final label = [for (var i = 0; i < 4; i++) '${batas[i]}–${batas[i + 1] - 1}'];
-    final mingguIni = bulanIniKah ? batas.indexWhere((b) => b > hariKe) - 1 : null;
+    final label = [
+      for (var i = 0; i < 4; i++) '${batas[i]}–${batas[i + 1] - 1}',
+    ];
+    final mingguIni = bulanIniKah
+        ? batas.indexWhere((b) => b > hariKe) - 1
+        : null;
     final nilai = <int?>[
       for (var i = 0; i < 4; i++)
         if (bulanIniKah && batas[i] > hariKe)
           null
         else
-          r.keluarPerHari.entries.where((e) {
-            final d = int.parse(e.key.substring(8));
-            return d >= batas[i] && d < batas[i + 1];
-          }).fold<int>(0, (a, e) => a + e.value),
+          r.keluarPerHari.entries
+              .where((e) {
+                final d = int.parse(e.key.substring(8));
+                return d >= batas[i] && d < batas[i + 1];
+              })
+              .fold<int>(0, (a, e) => a + e.value),
     ];
 
     final tabungan = r.selisih, tabunganLalu = rLalu.selisih;
@@ -217,7 +297,11 @@ class _Bulan extends StatelessWidget {
         HeroGemi(
           label: bulanIniKah ? 'Tabungan bulan ini' : 'Tabungan',
           nilai: 'Rp ${fmtRupiah(tabungan)}',
-          delta: ['Masuk ${fmtRupiah(r.masuk)}', 'keluar ${fmtRupiah(r.keluar)}', ?banding].join(' · '),
+          delta: [
+            'Masuk ${fmtRupiah(r.masuk)}',
+            'keluar ${fmtRupiah(r.keluar)}',
+            ?banding,
+          ].join(' · '),
         ),
         GrafikBatang(label: label, nilai: nilai, hariIni: mingguIni),
         if (totalKeluar > 0) ...[
@@ -225,15 +309,31 @@ class _Bulan extends StatelessWidget {
           Row(
             children: [
               GrafikDonat(
-                porsi: [for (final k in komposisi) k.total / totalKeluar, if (lainnya > 0) lainnya / totalKeluar],
-                warna: [for (final k in komposisi) g.kategori(k.kategori.color), if (lainnya > 0) g.kategori(5)],
+                porsi: [
+                  for (final k in komposisi) k.total / totalKeluar,
+                  if (lainnya > 0) lainnya / totalKeluar,
+                ],
+                warna: [
+                  for (final k in komposisi) g.kategori(k.kategori.color),
+                  if (lainnya > 0) g.kategori(5),
+                ],
               ),
               const SizedBox(width: 24),
               Expanded(
                 child: Column(
                   children: [
-                    for (final k in komposisi) _Legenda(warna: g.kategori(k.kategori.color), nama: k.kategori.name, persen: k.total * 100 ~/ totalKeluar),
-                    if (lainnya > 0) _Legenda(warna: g.kategori(5), nama: 'Lainnya', persen: lainnya * 100 ~/ totalKeluar),
+                    for (final k in komposisi)
+                      _Legenda(
+                        warna: g.kategori(k.kategori.color),
+                        nama: k.kategori.name,
+                        persen: k.total * 100 ~/ totalKeluar,
+                      ),
+                    if (lainnya > 0)
+                      _Legenda(
+                        warna: g.kategori(5),
+                        nama: 'Lainnya',
+                        persen: lainnya * 100 ~/ totalKeluar,
+                      ),
                   ],
                 ),
               ),
@@ -243,16 +343,35 @@ class _Bulan extends StatelessWidget {
         if (budget != null && budget.adaBudget) ...[
           _Judul('Terpakai / budget'),
           for (final b in budget.baris.where((b) => b.plafon > 0))
-            BarisGemi(judul: b.kategori.name, nominal: '${fmtRupiah(b.pakai)} / ${fmtRupiah(b.plafon)}', warnaNominal: b.lewat ? g.over : null),
+            BarisGemi(
+              judul: b.kategori.name,
+              nominal: '${fmtRupiah(b.pakai)} / ${fmtRupiah(b.plafon)}',
+              warnaNominal: b.lewat ? g.over : null,
+            ),
           Container(
             margin: const EdgeInsets.only(top: 8),
             padding: const EdgeInsets.symmetric(vertical: 12),
-            decoration: BoxDecoration(border: Border(top: BorderSide(color: ink), bottom: BorderSide(color: ink, width: 3))),
+            decoration: BoxDecoration(
+              border: Border(
+                top: BorderSide(color: ink),
+                bottom: BorderSide(color: ink, width: 3),
+              ),
+            ),
             child: Row(
               children: [
-                const Expanded(child: Text('Semua kategori', style: TextStyle(fontWeight: FontWeight.w600))),
-                Text('${fmtRupiah(budget.totalPakai)} / ${fmtRupiah(budget.totalPlafon)}',
-                    style: const TextStyle(fontWeight: FontWeight.w600, fontFeatures: [FontFeature.tabularFigures()])),
+                const Expanded(
+                  child: Text(
+                    'Semua kategori',
+                    style: TextStyle(fontWeight: FontWeight.w600),
+                  ),
+                ),
+                Text(
+                  '${fmtRupiah(budget.totalPakai)} / ${fmtRupiah(budget.totalPlafon)}',
+                  style: const TextStyle(
+                    fontWeight: FontWeight.w600,
+                    fontFeatures: [FontFeature.tabularFigures()],
+                  ),
+                ),
               ],
             ),
           ),
@@ -268,27 +387,45 @@ class _Judul extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Padding(
-        padding: const EdgeInsets.only(top: 32, bottom: 4),
-        child: Text(s, style: TextStyle(fontSize: 13, fontWeight: FontWeight.w500, color: context.gemi.ink2)),
-      );
+    padding: const EdgeInsets.only(top: 32, bottom: 4),
+    child: Text(
+      s,
+      style: TextStyle(
+        fontSize: 13,
+        fontWeight: FontWeight.w500,
+        color: context.gemi.ink2,
+      ),
+    ),
+  );
 }
 
 class _Legenda extends StatelessWidget {
-  const _Legenda({required this.warna, required this.nama, required this.persen});
+  const _Legenda({
+    required this.warna,
+    required this.nama,
+    required this.persen,
+  });
   final Color warna;
   final String nama;
   final int persen;
 
   @override
   Widget build(BuildContext context) => SizedBox(
-        height: 32,
-        child: Row(
-          children: [
-            Container(width: 8, height: 8, decoration: BoxDecoration(color: warna, shape: BoxShape.circle)),
-            const SizedBox(width: 8),
-            Expanded(child: Text(nama)),
-            Text('$persen%', style: const TextStyle(fontFeatures: [FontFeature.tabularFigures()])),
-          ],
+    height: 32,
+    child: Row(
+      children: [
+        Container(
+          width: 8,
+          height: 8,
+          decoration: BoxDecoration(color: warna, shape: BoxShape.circle),
         ),
-      );
+        const SizedBox(width: 8),
+        Expanded(child: Text(nama)),
+        Text(
+          '$persen%',
+          style: const TextStyle(fontFeatures: [FontFeature.tabularFigures()]),
+        ),
+      ],
+    ),
+  );
 }

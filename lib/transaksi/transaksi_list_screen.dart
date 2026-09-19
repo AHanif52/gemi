@@ -19,7 +19,10 @@ class TransaksiListScreen extends StatelessWidget {
       appBar: AppBar(title: const Text('Transaksi')),
       body: c.daftar.isEmpty
           ? const _Kosong()
-          : ListView(padding: const EdgeInsets.symmetric(horizontal: 24), children: bukuKas(context, c.daftar)),
+          : ListView(
+              padding: const EdgeInsets.symmetric(horizontal: 24),
+              children: bukuKas(context, c.daftar),
+            ),
     );
   }
 }
@@ -43,27 +46,53 @@ List<Widget> bukuKas(BuildContext context, List<TransaksiBaris> daftar) {
           JenisTransaksi.transfer => 0,
         };
       }
-      widgets.add(Padding(
-        padding: const EdgeInsets.only(top: 24, bottom: 8),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(fmtTanggal(tanggal), style: t.bodySmall?.copyWith(color: g.ink2)),
-            Text(
-              net > 0 ? '+${fmtRupiah(net)}' : fmtRupiah(net),
-              style: t.bodySmall?.copyWith(color: net > 0 ? g.income : net < 0 ? g.over : g.ink2, fontFeatures: const [FontFeature.tabularFigures()]),
-            ),
-          ],
+      widgets.add(
+        Padding(
+          padding: const EdgeInsets.only(top: 24, bottom: 8),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                fmtTanggal(tanggal),
+                style: t.bodySmall?.copyWith(color: g.ink2),
+              ),
+              Text(
+                net > 0 ? '+${fmtRupiah(net)}' : fmtRupiah(net),
+                style: t.bodySmall?.copyWith(
+                  color: net > 0
+                      ? g.income
+                      : net < 0
+                      ? g.over
+                      : g.ink2,
+                  fontFeatures: const [FontFeature.tabularFigures()],
+                ),
+              ),
+            ],
+          ),
         ),
-      ));
+      );
     }
     final (tanda, warna) = switch (b.t.type) {
       JenisTransaksi.income => ('+', g.income),
       JenisTransaksi.expense => ('−', g.over),
       JenisTransaksi.transfer => ('', g.ink3),
     };
-    widgets.add(BarisGemi(key: Key('transaksi.${b.t.id}'), judul: b.judul, sub: b.sub, nominal: '$tanda${fmtRupiah(b.t.amount)}', warnaNominal: warna,
-        onTap: () => Navigator.push(context, MaterialPageRoute(settings: const RouteSettings(name: '/transaksi/ubah'), builder: (_) => TransaksiUbahScreen(b)))));
+    widgets.add(
+      BarisGemi(
+        key: Key('transaksi.${b.t.id}'),
+        judul: b.judul,
+        sub: b.sub,
+        nominal: '$tanda${fmtRupiah(b.t.amount)}',
+        warnaNominal: warna,
+        onTap: () => Navigator.push(
+          context,
+          MaterialPageRoute(
+            settings: const RouteSettings(name: '/transaksi/ubah'),
+            builder: (_) => TransaksiUbahScreen(b),
+          ),
+        ),
+      ),
+    );
   }
   return widgets;
 }
@@ -79,9 +108,15 @@ class _Kosong extends StatelessWidget {
       child: Column(
         children: [
           const SizedBox(height: 48),
-          const Text('Belum ada transaksi', style: TextStyle(fontWeight: FontWeight.w500)),
+          const Text(
+            'Belum ada transaksi',
+            style: TextStyle(fontWeight: FontWeight.w500),
+          ),
           const SizedBox(height: 4),
-          Text('Ketuk + untuk mencatat yang pertama.', style: TextStyle(color: g.ink2)),
+          Text(
+            'Ketuk + untuk mencatat yang pertama.',
+            style: TextStyle(color: g.ink2),
+          ),
         ],
       ),
     );

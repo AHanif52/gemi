@@ -34,17 +34,31 @@ class _KantongFormScreenState extends State<KantongFormScreen> {
     final nav = Navigator.of(context);
     final messenger = ScaffoldMessenger.of(context);
     try {
-      await c.tambah(nama: _nama.text, jenis: _jenis, saldoAwal: parseRupiah(_saldo.text));
+      await c.tambah(
+        nama: _nama.text,
+        jenis: _jenis,
+        saldoAwal: parseRupiah(_saldo.text),
+      );
     } on ArgumentError {
-      messenger.showSnackBar(const SnackBar(content: Text('Isi nama kantong dulu')));
+      messenger.showSnackBar(
+        const SnackBar(content: Text('Isi nama kantong dulu')),
+      );
       return;
     }
     if (widget.pertama) {
       nav.pushReplacementNamed('/beranda');
-      messenger.showSnackBar(SnackBar(content: Text('Kantong ${_nama.text.trim()} dibuat. Ketuk + untuk transaksi pertama.')));
+      messenger.showSnackBar(
+        SnackBar(
+          content: Text(
+            'Kantong ${_nama.text.trim()} dibuat. Ketuk + untuk transaksi pertama.',
+          ),
+        ),
+      );
     } else {
       nav.pop();
-      messenger.showSnackBar(const SnackBar(content: Text('Kantong ditambahkan')));
+      messenger.showSnackBar(
+        const SnackBar(content: Text('Kantong ditambahkan')),
+      );
     }
   }
 
@@ -54,7 +68,15 @@ class _KantongFormScreenState extends State<KantongFormScreen> {
     final g = context.gemi;
     final pertama = widget.pertama;
     return Scaffold(
-      appBar: pertama ? null : AppBar(leading: TextButton(onPressed: () => Navigator.pop(context), child: const Text('Batal')), leadingWidth: 80),
+      appBar: pertama
+          ? null
+          : AppBar(
+              leading: TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('Batal'),
+              ),
+              leadingWidth: 80,
+            ),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 24),
@@ -64,7 +86,10 @@ class _KantongFormScreenState extends State<KantongFormScreen> {
               if (pertama) const Spacer(),
               Padding(
                 padding: const EdgeInsets.only(top: 8, bottom: 16),
-                child: Text(pertama ? 'Gemi' : 'Kantong baru', style: pertama ? t.displaySmall : t.titleLarge),
+                child: Text(
+                  pertama ? 'Gemi' : 'Kantong baru',
+                  style: pertama ? t.displaySmall : t.titleLarge,
+                ),
               ),
               if (pertama)
                 Padding(
@@ -80,7 +105,10 @@ class _KantongFormScreenState extends State<KantongFormScreen> {
                 controller: _nama,
                 autofocus: true,
                 textCapitalization: TextCapitalization.words,
-                decoration: InputDecoration(labelText: pertama ? 'Nama kantong' : 'Nama', hintText: 'BCA'),
+                decoration: InputDecoration(
+                  labelText: pertama ? 'Nama kantong' : 'Nama',
+                  hintText: 'BCA',
+                ),
               ),
               const SizedBox(height: 12),
               Text('Jenis', style: t.bodySmall?.copyWith(color: g.ink2)),
@@ -102,9 +130,17 @@ class _KantongFormScreenState extends State<KantongFormScreen> {
                 key: const Key('kantong.saldo'),
                 controller: _saldo,
                 keyboardType: TextInputType.number,
-                inputFormatters: [FilteringTextInputFormatter.digitsOnly, RibuanFormatter()],
-                style: t.displaySmall?.copyWith(fontFeatures: const [FontFeature.tabularFigures()]),
-                decoration: const InputDecoration(labelText: 'Saldo sekarang', hintText: '0'),
+                inputFormatters: [
+                  FilteringTextInputFormatter.digitsOnly,
+                  RibuanFormatter(),
+                ],
+                style: t.displaySmall?.copyWith(
+                  fontFeatures: const [FontFeature.tabularFigures()],
+                ),
+                decoration: const InputDecoration(
+                  labelText: 'Saldo sekarang',
+                  hintText: '0',
+                ),
               ),
               const SizedBox(height: 4),
               Text(

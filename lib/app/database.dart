@@ -23,18 +23,22 @@ class GemiDatabase extends _$GemiDatabase {
   /// hidup hanya di Keystore/Keychain (BRD: Arsitektur & keamanan).
   static Future<GemiDatabase> buka() async {
     final kunci = await _kunciDb();
-    return GemiDatabase(driftDatabase(
-      name: 'gemi',
-      native: DriftNativeOptions(
-        setup: (db) {
-          // Raw key hex: SQLCipher pakai langsung tanpa KDF; bukan passphrase.
-          db.execute("PRAGMA key = \"x'$kunci'\"");
-          if (db.select('PRAGMA cipher_version').isEmpty) {
-            throw StateError('database: SQLCipher tidak aktif, DB tidak terenkripsi');
-          }
-        },
+    return GemiDatabase(
+      driftDatabase(
+        name: 'gemi',
+        native: DriftNativeOptions(
+          setup: (db) {
+            // Raw key hex: SQLCipher pakai langsung tanpa KDF; bukan passphrase.
+            db.execute("PRAGMA key = \"x'$kunci'\"");
+            if (db.select('PRAGMA cipher_version').isEmpty) {
+              throw StateError(
+                'database: SQLCipher tidak aktif, DB tidak terenkripsi',
+              );
+            }
+          },
+        ),
       ),
-    ));
+    );
   }
 
   @override
@@ -42,31 +46,42 @@ class GemiDatabase extends _$GemiDatabase {
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
-        onCreate: (m) async {
-          await m.createAll();
-          // FR-05: kategori bawaan terisi otomatis saat pertama install.
-          await batch((b) {
-            for (final (i, k) in kategoriBawaan.indexed) {
-              b.insert(
-                categories,
-                CategoriesCompanion.insert(name: k.nama, type: k.jenis, color: k.warna, isDefault: const Value(true), sortOrder: Value(i)),
-              );
-            }
-          });
-        },
-      );
+    onCreate: (m) async {
+      await m.createAll();
+      // FR-05: kategori bawaan terisi otomatis saat pertama install.
+      await batch((b) {
+        for (final (i, k) in kategoriBawaan.indexed) {
+          b.insert(
+            categories,
+            CategoriesCompanion.insert(
+              name: k.nama,
+              type: k.jenis,
+              color: k.warna,
+              isDefault: const Value(true),
+              sortOrder: Value(i),
+            ),
+          );
+        }
+      });
+    },
+  );
 }
 
 /// Kunci DB dari secure storage; dibuat acak kalau belum ada. 64 hex = 32 byte.
 /// resetOnError false: kalau Keystore gagal dibaca, lebih baik error daripada
 /// kunci diganti diam-diam dan seluruh data tidak terbaca.
 Future<String> _kunciDb() async {
-  const storage = FlutterSecureStorage(aOptions: AndroidOptions(resetOnError: false));
+  const storage = FlutterSecureStorage(
+    aOptions: AndroidOptions(resetOnError: false),
+  );
   const nama = 'db_key';
   final ada = await storage.read(key: nama);
   if (ada != null) return ada;
   final r = Random.secure();
-  final baru = List.generate(32, (_) => r.nextInt(256).toRadixString(16).padLeft(2, '0')).join();
+  final baru = List.generate(
+    32,
+    (_) => r.nextInt(256).toRadixString(16).padLeft(2, '0'),
+  ).join();
   await storage.write(key: nama, value: baru);
   return baru;
 }

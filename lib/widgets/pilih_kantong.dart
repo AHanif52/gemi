@@ -20,7 +20,12 @@ Future<int?> pilihKantong(BuildContext context, {required String judul}) {
           Text(judul, style: Theme.of(ctx).textTheme.titleMedium),
           const SizedBox(height: 8),
           for (final k in c.daftar)
-            BarisGemi(judul: k.name, sub: k.type.label, nominal: fmtRupiah(c.saldo(k)), onTap: () => Navigator.pop(ctx, k.id)),
+            BarisGemi(
+              judul: k.name,
+              sub: k.type.label,
+              nominal: fmtRupiah(c.saldo(k)),
+              onTap: () => Navigator.pop(ctx, k.id),
+            ),
         ],
       ),
     ),
@@ -29,7 +34,12 @@ Future<int?> pilihKantong(BuildContext context, {required String judul}) {
 
 /// Baris "label · nilai ›" yang membuka pilihan (tokens .pick).
 class BarisPilih extends StatelessWidget {
-  const BarisPilih({super.key, required this.label, required this.nilai, required this.onTap});
+  const BarisPilih({
+    super.key,
+    required this.label,
+    required this.nilai,
+    required this.onTap,
+  });
   final String label, nilai;
   final VoidCallback onTap;
 
@@ -43,7 +53,9 @@ class BarisPilih extends StatelessWidget {
         padding: const EdgeInsets.symmetric(vertical: 8),
         child: Row(
           children: [
-            Expanded(child: Text(label, style: TextStyle(fontSize: 13, color: g.ink2))),
+            Expanded(
+              child: Text(label, style: TextStyle(fontSize: 13, color: g.ink2)),
+            ),
             Text(nilai),
             const SizedBox(width: 12),
             Text('›', style: TextStyle(color: g.ink3)),
@@ -56,6 +68,16 @@ class BarisPilih extends StatelessWidget {
 
 /// Nama kantong dari id, "?" kalau tidak ada.
 String namaKantong(BuildContext context, int? id) =>
-    context.read<KantongController>().daftar.where((k) => k.id == id).map((k) => k.name).firstOrNull ?? '?';
+    context
+        .read<KantongController>()
+        .daftar
+        .where((k) => k.id == id)
+        .map((k) => k.name)
+        .firstOrNull ??
+    '?';
 
-Kantong? kantongById(BuildContext context, int? id) => context.read<KantongController>().daftar.where((k) => k.id == id).firstOrNull;
+Kantong? kantongById(BuildContext context, int? id) => context
+    .read<KantongController>()
+    .daftar
+    .where((k) => k.id == id)
+    .firstOrNull;

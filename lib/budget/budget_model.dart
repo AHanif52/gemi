@@ -12,13 +12,17 @@ class Budgets extends Table {
 
   @override
   List<Set<Column>> get uniqueKeys => [
-        {categoryId, month},
-      ];
+    {categoryId, month},
+  ];
 }
 
 /// Satu baris halaman budget: kategori + plafon + terpakai. plafon 0 = tanpa budget.
 class BarisBudget {
-  const BarisBudget({required this.kategori, required this.plafon, required this.pakai});
+  const BarisBudget({
+    required this.kategori,
+    required this.plafon,
+    required this.pakai,
+  });
   final Kategori kategori;
   final int plafon, pakai;
 
@@ -35,7 +39,8 @@ class DataBulan {
   final List<BarisBudget> baris;
 
   int get totalPlafon => baris.fold(0, (a, b) => a + b.plafon);
-  int get totalPakai => baris.where((b) => b.plafon > 0).fold(0, (a, b) => a + b.pakai);
+  int get totalPakai =>
+      baris.where((b) => b.plafon > 0).fold(0, (a, b) => a + b.pakai);
   int get sisa => totalPlafon - totalPakai;
   bool get adaBudget => totalPlafon > 0;
 }

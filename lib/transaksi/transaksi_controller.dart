@@ -21,17 +21,23 @@ class TransaksiController extends ChangeNotifier {
   Transaksi? _terakhir;
 
   List<TransaksiBaris> get daftar => _daftar;
-  List<Kategori> kategori(JenisTransaksi j) => j == JenisTransaksi.income ? _kategoriMasuk : _kategoriKeluar;
+  List<Kategori> kategori(JenisTransaksi j) =>
+      j == JenisTransaksi.income ? _kategoriMasuk : _kategoriKeluar;
 
   /// Default form: kategori/kantong terakhir dipakai; pertama kali kategori pertama, kantong pertama (FR-05).
   int? kategoriDefault(JenisTransaksi j) {
     final list = kategori(j);
     final last = _terakhir;
-    if (last != null && last.type == j && list.any((k) => k.id == last.categoryId)) return last.categoryId;
+    if (last != null &&
+        last.type == j &&
+        list.any((k) => k.id == last.categoryId)) {
+      return last.categoryId;
+    }
     return list.isEmpty ? null : list.first.id;
   }
 
-  int? kantongDefault() => _terakhir?.accountId ?? _kantong.daftar.firstOrNull?.id;
+  int? kantongDefault() =>
+      _terakhir?.accountId ?? _kantong.daftar.firstOrNull?.id;
 
   Future<void> muat() async {
     _daftar = await _repo.semua();
@@ -51,8 +57,18 @@ class TransaksiController extends ChangeNotifier {
     required String tanggal,
     String? catatan,
   }) async {
-    final id = await _repo.tambah(_susun(
-        aksi: 'tambah', jenis: jenis, nominal: nominal, kantongId: kantongId, kantongTujuanId: kantongTujuanId, kategoriId: kategoriId, tanggal: tanggal, catatan: catatan));
+    final id = await _repo.tambah(
+      _susun(
+        aksi: 'tambah',
+        jenis: jenis,
+        nominal: nominal,
+        kantongId: kantongId,
+        kantongTujuanId: kantongTujuanId,
+        kategoriId: kategoriId,
+        tanggal: tanggal,
+        catatan: catatan,
+      ),
+    );
     await _segarkan();
     return id;
   }
@@ -68,8 +84,19 @@ class TransaksiController extends ChangeNotifier {
     required String tanggal,
     String? catatan,
   }) async {
-    await _repo.ubah(id, _susun(
-        aksi: 'ubah', jenis: jenis, nominal: nominal, kantongId: kantongId, kantongTujuanId: kantongTujuanId, kategoriId: kategoriId, tanggal: tanggal, catatan: catatan));
+    await _repo.ubah(
+      id,
+      _susun(
+        aksi: 'ubah',
+        jenis: jenis,
+        nominal: nominal,
+        kantongId: kantongId,
+        kantongTujuanId: kantongTujuanId,
+        kategoriId: kategoriId,
+        tanggal: tanggal,
+        catatan: catatan,
+      ),
+    );
     await _segarkan();
   }
 
@@ -84,11 +111,19 @@ class TransaksiController extends ChangeNotifier {
     required String tanggal,
     String? catatan,
   }) {
-    if (nominal <= 0) throw ArgumentError('transaksi.$aksi: nominal harus lebih dari 0');
+    if (nominal <= 0) {
+      throw ArgumentError('transaksi.$aksi: nominal harus lebih dari 0');
+    }
     final transfer = jenis == JenisTransaksi.transfer;
-    if (transfer && kantongTujuanId == null) throw ArgumentError('transaksi.$aksi: transfer butuh kantong tujuan');
-    if (transfer && kantongTujuanId == kantongId) throw ArgumentError('transaksi.$aksi: kantong asal dan tujuan sama');
-    if (!transfer && kategoriId == null) throw ArgumentError('transaksi.$aksi: kategori wajib dipilih');
+    if (transfer && kantongTujuanId == null) {
+      throw ArgumentError('transaksi.$aksi: transfer butuh kantong tujuan');
+    }
+    if (transfer && kantongTujuanId == kantongId) {
+      throw ArgumentError('transaksi.$aksi: kantong asal dan tujuan sama');
+    }
+    if (!transfer && kategoriId == null) {
+      throw ArgumentError('transaksi.$aksi: kategori wajib dipilih');
+    }
     final note = catatan?.trim();
     return TransactionsCompanion(
       type: Value(jenis),

@@ -4,10 +4,19 @@ import '../app/theme.dart';
 
 /// Baris buku kas: judul + sub di kiri, nominal tabular di kanan (tokens .row).
 class BarisGemi extends StatelessWidget {
-  const BarisGemi({super.key, required this.judul, this.sub, required this.nominal, this.warnaNominal, this.onTap});
+  const BarisGemi({
+    super.key,
+    required this.judul,
+    this.sub,
+    this.titik,
+    required this.nominal,
+    this.warnaNominal,
+    this.onTap,
+  });
 
   final String judul;
   final String? sub;
+  final Color? titik; // dot warna kategori di depan judul
   final String nominal;
   final Color? warnaNominal;
   final VoidCallback? onTap;
@@ -28,15 +37,37 @@ class BarisGemi extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(judul, style: t.bodyMedium),
-                  if (sub != null) Text(sub!, style: t.bodySmall?.copyWith(color: context.gemi.ink2)),
+                  Row(
+                    children: [
+                      if (titik != null) ...[
+                        Container(
+                          width: 8,
+                          height: 8,
+                          decoration: BoxDecoration(
+                            color: titik,
+                            shape: BoxShape.circle,
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                      ],
+                      Flexible(child: Text(judul, style: t.bodyMedium)),
+                    ],
+                  ),
+                  if (sub != null)
+                    Text(
+                      sub!,
+                      style: t.bodySmall?.copyWith(color: context.gemi.ink2),
+                    ),
                 ],
               ),
             ),
             const SizedBox(width: 12),
             Text(
               nominal,
-              style: t.bodyMedium?.copyWith(fontFeatures: const [FontFeature.tabularFigures()], color: warnaNominal),
+              style: t.bodyMedium?.copyWith(
+                fontFeatures: const [FontFeature.tabularFigures()],
+                color: warnaNominal,
+              ),
             ),
           ],
         ),
@@ -47,10 +78,20 @@ class BarisGemi extends StatelessWidget {
 
 /// Baris yang membuka layar lain (tokens .link-row): label, nilai, chevron.
 class BarisTautan extends StatelessWidget {
-  const BarisTautan({super.key, required this.label, this.nilai, this.ikon = '›', required this.onTap});
+  const BarisTautan({
+    super.key,
+    required this.label,
+    this.sub,
+    this.nilai,
+    this.ikon = '›',
+    required this.onTap,
+    this.tanpaGarisAtas = false,
+  });
 
   final String label;
+  final String? sub;
   final String? nilai;
+  final bool tanpaGarisAtas; // baris beruntun: garis atas dari baris sebelumnya sudah cukup
   final String ikon;
   final VoidCallback onTap;
 
@@ -62,11 +103,31 @@ class BarisTautan extends StatelessWidget {
       child: Container(
         constraints: const BoxConstraints(minHeight: 44),
         padding: const EdgeInsets.symmetric(vertical: 12),
-        decoration: BoxDecoration(border: Border.symmetric(horizontal: BorderSide(color: g.rule))),
+        decoration: BoxDecoration(
+          border: Border(
+            top: tanpaGarisAtas ? BorderSide.none : BorderSide(color: g.rule),
+            bottom: BorderSide(color: g.rule),
+          ),
+        ),
         child: Row(
           children: [
-            Expanded(child: Text(label)),
-            if (nilai != null) Text(nilai!, style: const TextStyle(fontFeatures: [FontFeature.tabularFigures()])),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(label),
+                  if (sub != null)
+                    Text(sub!, style: TextStyle(fontSize: 13, color: g.ink2)),
+                ],
+              ),
+            ),
+            if (nilai != null)
+              Text(
+                nilai!,
+                style: const TextStyle(
+                  fontFeatures: [FontFeature.tabularFigures()],
+                ),
+              ),
             const SizedBox(width: 12),
             Text(ikon, style: TextStyle(color: g.ink3)),
           ],

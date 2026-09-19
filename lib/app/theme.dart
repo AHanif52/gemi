@@ -16,9 +16,24 @@ class GemiColors extends ThemeExtension<GemiColors> {
   final Color ink2, ink3, rule, income, over, near;
 
   /// Warna kategori cat-1..cat-5 + cat-other, indeks = kolom `color` di tabel categories.
-  static const _katLight = [Color(0xFF1F7A52), Color(0xFF2F5FA8), Color(0xFFB8862B), Color(0xFF8A4FA3), Color(0xFFC4553A), Color(0xFF6B756F)];
-  static const _katDark = [Color(0xFF3FA574), Color(0xFF5F88D0), Color(0xFFB4862E), Color(0xFFA97AC2), Color(0xFFD06A50), Color(0xFF7E8882)];
-  Color kategori(int i) => (this == light ? _katLight : _katDark)[i.clamp(0, 5)];
+  static const _katLight = [
+    Color(0xFF1F7A52),
+    Color(0xFF2F5FA8),
+    Color(0xFFB8862B),
+    Color(0xFF8A4FA3),
+    Color(0xFFC4553A),
+    Color(0xFF6B756F),
+  ];
+  static const _katDark = [
+    Color(0xFF3FA574),
+    Color(0xFF5F88D0),
+    Color(0xFFB4862E),
+    Color(0xFFA97AC2),
+    Color(0xFFD06A50),
+    Color(0xFF7E8882),
+  ];
+  Color kategori(int i) =>
+      (this == light ? _katLight : _katDark)[i.clamp(0, 5)];
 
   static const light = GemiColors(
     ink2: Color(0xFF5E6863),
@@ -38,18 +53,25 @@ class GemiColors extends ThemeExtension<GemiColors> {
   );
 
   @override
-  GemiColors copyWith({Color? ink2, Color? ink3, Color? rule, Color? income, Color? over, Color? near}) =>
-      GemiColors(
-        ink2: ink2 ?? this.ink2,
-        ink3: ink3 ?? this.ink3,
-        rule: rule ?? this.rule,
-        income: income ?? this.income,
-        over: over ?? this.over,
-        near: near ?? this.near,
-      );
+  GemiColors copyWith({
+    Color? ink2,
+    Color? ink3,
+    Color? rule,
+    Color? income,
+    Color? over,
+    Color? near,
+  }) => GemiColors(
+    ink2: ink2 ?? this.ink2,
+    ink3: ink3 ?? this.ink3,
+    rule: rule ?? this.rule,
+    income: income ?? this.income,
+    over: over ?? this.over,
+    near: near ?? this.near,
+  );
 
   @override
-  GemiColors lerp(GemiColors? other, double t) => t < .5 ? this : (other ?? this);
+  GemiColors lerp(GemiColors? other, double t) =>
+      t < .5 ? this : (other ?? this);
 }
 
 extension GemiTheme on BuildContext {
@@ -81,9 +103,21 @@ ThemeData _build({
     textTheme: const TextTheme(
       bodyMedium: TextStyle(fontSize: 15, height: 1.45),
       bodySmall: TextStyle(fontSize: 13, height: 1.45),
-      titleMedium: TextStyle(fontSize: 17, fontWeight: FontWeight.w600, height: 1.2),
-      titleLarge: TextStyle(fontSize: 22, fontWeight: FontWeight.w600, height: 1.2),
-      displaySmall: TextStyle(fontSize: 34, fontWeight: FontWeight.w600, height: 1.2),
+      titleMedium: TextStyle(
+        fontSize: 17,
+        fontWeight: FontWeight.w600,
+        height: 1.2,
+      ),
+      titleLarge: TextStyle(
+        fontSize: 22,
+        fontWeight: FontWeight.w600,
+        height: 1.2,
+      ),
+      displaySmall: TextStyle(
+        fontSize: 34,
+        fontWeight: FontWeight.w600,
+        height: 1.2,
+      ),
     ).apply(bodyColor: ink, displayColor: ink),
     appBarTheme: AppBarTheme(
       backgroundColor: surface,
@@ -91,7 +125,11 @@ ThemeData _build({
       elevation: 0,
       scrolledUnderElevation: 0,
       centerTitle: false,
-      titleTextStyle: TextStyle(fontSize: 22, fontWeight: FontWeight.w600, color: ink),
+      titleTextStyle: TextStyle(
+        fontSize: 22,
+        fontWeight: FontWeight.w600,
+        color: ink,
+      ),
     ),
     filledButtonTheme: FilledButtonThemeData(
       style: FilledButton.styleFrom(

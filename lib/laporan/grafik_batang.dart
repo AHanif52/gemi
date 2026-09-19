@@ -7,7 +7,12 @@ import '../app/theme.dart';
 /// batang ujung bulat, label di bawah, nilai tertinggi ditulis ringkas di atasnya,
 /// batang hari ini lebih gelap. Nilai null = periode belum lewat, tidak digambar.
 class GrafikBatang extends StatelessWidget {
-  const GrafikBatang({super.key, required this.label, required this.nilai, this.hariIni});
+  const GrafikBatang({
+    super.key,
+    required this.label,
+    required this.nilai,
+    this.hariIni,
+  });
   final List<String> label;
   final List<int?> nilai;
   final int? hariIni;
@@ -18,7 +23,15 @@ class GrafikBatang extends StatelessWidget {
     return SizedBox(
       height: 140,
       width: double.infinity,
-      child: CustomPaint(painter: _Painter(label, nilai, hariIni, g, Theme.of(context).colorScheme.onSurface)),
+      child: CustomPaint(
+        painter: _Painter(
+          label,
+          nilai,
+          hariIni,
+          g,
+          Theme.of(context).colorScheme.onSurface,
+        ),
+      ),
     );
   }
 }
@@ -40,26 +53,60 @@ class _Painter extends CustomPainter {
     final slot = size.width / n;
     final bw = (slot - 8).clamp(4.0, 28.0);
 
-    canvas.drawLine(Offset(0, base), Offset(size.width, base), Paint()..color = g.rule..strokeWidth = 1);
+    canvas.drawLine(
+      Offset(0, base),
+      Offset(size.width, base),
+      Paint()
+        ..color = g.rule
+        ..strokeWidth = 1,
+    );
 
     for (var i = 0; i < n; i++) {
       final x = i * slot + (slot - bw) / 2;
       final v = nilai[i];
       if (v != null) {
-        final h = maks == 0 ? 4.0 : (v / maks * (base - padT)).clamp(4.0, base - padT);
-        final r = RRect.fromRectAndCorners(Rect.fromLTWH(x, base - h, bw, h), topLeft: const Radius.circular(4), topRight: const Radius.circular(4));
+        final h = maks == 0
+            ? 4.0
+            : (v / maks * (base - padT)).clamp(4.0, base - padT);
+        final r = RRect.fromRectAndCorners(
+          Rect.fromLTWH(x, base - h, bw, h),
+          topLeft: const Radius.circular(4),
+          topRight: const Radius.circular(4),
+        );
         canvas.drawRRect(r, Paint()..color = i == hariIni ? ink : g.ink2);
-        if (v == maks && maks > 0) _teks(canvas, fmtRingkas(v), Offset(x + bw / 2, base - h - 5), bawah: false);
+        if (v == maks && maks > 0) {
+          _teks(
+            canvas,
+            fmtRingkas(v),
+            Offset(x + bw / 2, base - h - 5),
+            bawah: false,
+          );
+        }
       }
       _teks(canvas, label[i], Offset(x + bw / 2, size.height - 6), bawah: true);
     }
   }
 
-  void _teks(Canvas canvas, String s, Offset tengahBawah, {required bool bawah}) {
-    final tp = TextPainter(text: TextSpan(text: s, style: TextStyle(fontSize: 11, color: g.ink2)), textDirection: TextDirection.ltr)..layout();
-    tp.paint(canvas, Offset(tengahBawah.dx - tp.width / 2, tengahBawah.dy - tp.height));
+  void _teks(
+    Canvas canvas,
+    String s,
+    Offset tengahBawah, {
+    required bool bawah,
+  }) {
+    final tp = TextPainter(
+      text: TextSpan(
+        text: s,
+        style: TextStyle(fontSize: 11, color: g.ink2),
+      ),
+      textDirection: TextDirection.ltr,
+    )..layout();
+    tp.paint(
+      canvas,
+      Offset(tengahBawah.dx - tp.width / 2, tengahBawah.dy - tp.height),
+    );
   }
 
   @override
-  bool shouldRepaint(_Painter o) => o.nilai != nilai || o.label != label || o.hariIni != hariIni || o.g != g;
+  bool shouldRepaint(_Painter o) =>
+      o.nilai != nilai || o.label != label || o.hariIni != hariIni || o.g != g;
 }

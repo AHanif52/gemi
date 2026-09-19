@@ -32,12 +32,12 @@ class _TransaksiFormScreenState extends State<TransaksiFormScreen> {
   }
 
   void _ketik(String k) => setState(() {
-        if (k == '⌫') {
-          _digit = _digit.isEmpty ? '' : _digit.substring(0, _digit.length - 1);
-        } else if (_digit.length + k.length <= 12) {
-          _digit = (_digit + k).replaceFirst(RegExp(r'^0+(?=\d)'), '');
-        }
-      });
+    if (k == '⌫') {
+      _digit = _digit.isEmpty ? '' : _digit.substring(0, _digit.length - 1);
+    } else if (_digit.length + k.length <= 12) {
+      _digit = (_digit + k).replaceFirst(RegExp(r'^0+(?=\d)'), '');
+    }
+  });
 
   Future<void> _lanjut() async {
     if (_nominal <= 0) return _pesan('Nominal harus lebih dari 0');
@@ -46,17 +46,31 @@ class _TransaksiFormScreenState extends State<TransaksiFormScreen> {
         context,
         MaterialPageRoute(
           settings: const RouteSettings(name: '/transaksi/baru/kategori'),
-          builder: (_) => TransaksiKategoriScreen(jenis: _jenis, nominal: _nominal, kantongId: _dari),
+          builder: (_) => TransaksiKategoriScreen(
+            jenis: _jenis,
+            nominal: _nominal,
+            kantongId: _dari,
+          ),
         ),
       );
       return;
     }
-    if (_dari == null || _ke == null) return _pesan('Pilih kantong asal dan tujuan');
+    if (_dari == null || _ke == null) {
+      return _pesan('Pilih kantong asal dan tujuan');
+    }
     if (_dari == _ke) return _pesan('Kantong asal dan tujuan sama');
-    await simpanTransaksi(context, jenis: _jenis, nominal: _nominal, kantongId: _dari!, kantongTujuanId: _ke, tanggal: hariIni());
+    await simpanTransaksi(
+      context,
+      jenis: _jenis,
+      nominal: _nominal,
+      kantongId: _dari!,
+      kantongTujuanId: _ke,
+      tanggal: hariIni(),
+    );
   }
 
-  void _pesan(String s) => ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(s)));
+  void _pesan(String s) =>
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(s)));
 
   @override
   Widget build(BuildContext context) {
@@ -70,9 +84,23 @@ class _TransaksiFormScreenState extends State<TransaksiFormScreen> {
     };
     return Scaffold(
       appBar: AppBar(
-        leading: TextButton(onPressed: () => Navigator.pop(context), child: const Text('Batal')),
+        leading: TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: const Text('Batal'),
+        ),
         leadingWidth: 80,
-        actions: [if (!transfer) Padding(padding: const EdgeInsets.only(right: 24), child: Center(child: Text('1 dari 2', style: t.bodySmall?.copyWith(color: g.ink2))))],
+        actions: [
+          if (!transfer)
+            Padding(
+              padding: const EdgeInsets.only(right: 24),
+              child: Center(
+                child: Text(
+                  '1 dari 2',
+                  style: t.bodySmall?.copyWith(color: g.ink2),
+                ),
+              ),
+            ),
+        ],
       ),
       body: SafeArea(
         child: Padding(
@@ -80,19 +108,36 @@ class _TransaksiFormScreenState extends State<TransaksiFormScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Padding(padding: const EdgeInsets.only(top: 8, bottom: 12), child: Text(judul, style: t.titleLarge)),
-              _Segmen(nilai: _jenis, onPilih: (j) => setState(() => _jenis = j)),
+              Padding(
+                padding: const EdgeInsets.only(top: 8, bottom: 12),
+                child: Text(judul, style: t.titleLarge),
+              ),
+              _Segmen(
+                nilai: _jenis,
+                onPilih: (j) => setState(() => _jenis = j),
+              ),
               Padding(
                 padding: const EdgeInsets.symmetric(vertical: 24),
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.baseline,
                   textBaseline: TextBaseline.alphabetic,
                   children: [
-                    Text('Rp ', style: t.titleMedium?.copyWith(fontWeight: FontWeight.w400, color: g.ink2)),
+                    Text(
+                      'Rp ',
+                      style: t.titleMedium?.copyWith(
+                        fontWeight: FontWeight.w400,
+                        color: g.ink2,
+                      ),
+                    ),
                     Text(
                       key: const Key('transaksi.nominal'),
                       fmtRupiah(_nominal),
-                      style: const TextStyle(fontSize: 44, fontWeight: FontWeight.w600, height: 1.1, fontFeatures: [FontFeature.tabularFigures()]),
+                      style: const TextStyle(
+                        fontSize: 44,
+                        fontWeight: FontWeight.w600,
+                        height: 1.1,
+                        fontFeatures: [FontFeature.tabularFigures()],
+                      ),
                     ),
                   ],
                 ),
@@ -103,7 +148,10 @@ class _TransaksiFormScreenState extends State<TransaksiFormScreen> {
                   label: 'Dari kantong',
                   nilai: namaKantong(context, _dari),
                   onTap: () async {
-                    final id = await pilihKantong(context, judul: 'Dari kantong');
+                    final id = await pilihKantong(
+                      context,
+                      judul: 'Dari kantong',
+                    );
                     if (id != null) setState(() => _dari = id);
                   },
                 ),
@@ -118,7 +166,9 @@ class _TransaksiFormScreenState extends State<TransaksiFormScreen> {
                 ),
               ] else
                 Text(
-                  _jenis == JenisTransaksi.income ? 'Masuk ke ${namaKantong(context, _dari)}' : 'Dari ${namaKantong(context, _dari)}',
+                  _jenis == JenisTransaksi.income
+                      ? 'Masuk ke ${namaKantong(context, _dari)}'
+                      : 'Dari ${namaKantong(context, _dari)}',
                   style: t.bodySmall?.copyWith(color: g.ink2),
                 ),
               const Spacer(),
@@ -141,13 +191,19 @@ class _TransaksiFormScreenState extends State<TransaksiFormScreen> {
 
 /// /transaksi/baru/kategori — langkah 2: kategori, kantong, tanggal, catatan, Simpan.
 class TransaksiKategoriScreen extends StatefulWidget {
-  const TransaksiKategoriScreen({super.key, required this.jenis, required this.nominal, this.kantongId});
+  const TransaksiKategoriScreen({
+    super.key,
+    required this.jenis,
+    required this.nominal,
+    this.kantongId,
+  });
   final JenisTransaksi jenis;
   final int nominal;
   final int? kantongId;
 
   @override
-  State<TransaksiKategoriScreen> createState() => _TransaksiKategoriScreenState();
+  State<TransaksiKategoriScreen> createState() =>
+      _TransaksiKategoriScreenState();
 }
 
 class _TransaksiKategoriScreenState extends State<TransaksiKategoriScreen> {
@@ -158,7 +214,9 @@ class _TransaksiKategoriScreenState extends State<TransaksiKategoriScreen> {
   @override
   void initState() {
     super.initState();
-    _kategori = context.read<TransaksiController>().kategoriDefault(widget.jenis);
+    _kategori = context.read<TransaksiController>().kategoriDefault(
+      widget.jenis,
+    );
     _kantong = widget.kantongId;
   }
 
@@ -171,11 +229,19 @@ class _TransaksiKategoriScreenState extends State<TransaksiKategoriScreen> {
   Future<void> _simpan() async {
     if (_kategori == null) return _pesan('Pilih kategori dulu');
     if (_kantong == null) return _pesan('Pilih kantong dulu');
-    await simpanTransaksi(context,
-        jenis: widget.jenis, nominal: widget.nominal, kantongId: _kantong!, kategoriId: _kategori, tanggal: _tanggal, catatan: _catatan.text);
+    await simpanTransaksi(
+      context,
+      jenis: widget.jenis,
+      nominal: widget.nominal,
+      kantongId: _kantong!,
+      kategoriId: _kategori,
+      tanggal: _tanggal,
+      catatan: _catatan.text,
+    );
   }
 
-  void _pesan(String s) => ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(s)));
+  void _pesan(String s) =>
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(s)));
 
   @override
   Widget build(BuildContext context) {
@@ -185,9 +251,22 @@ class _TransaksiKategoriScreenState extends State<TransaksiKategoriScreen> {
     final masuk = widget.jenis == JenisTransaksi.income;
     return Scaffold(
       appBar: AppBar(
-        leading: TextButton(onPressed: () => Navigator.pop(context), child: const Text('‹ Nominal')),
+        leading: TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: const Text('‹ Nominal'),
+        ),
         leadingWidth: 110,
-        actions: [Padding(padding: const EdgeInsets.only(right: 24), child: Center(child: Text('2 dari 2', style: t.bodySmall?.copyWith(color: g.ink2))))],
+        actions: [
+          Padding(
+            padding: const EdgeInsets.only(right: 24),
+            child: Center(
+              child: Text(
+                '2 dari 2',
+                style: t.bodySmall?.copyWith(color: g.ink2),
+              ),
+            ),
+          ),
+        ],
       ),
       body: SafeArea(
         child: Padding(
@@ -196,8 +275,16 @@ class _TransaksiKategoriScreenState extends State<TransaksiKategoriScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const SizedBox(height: 8),
-              Text(widget.jenis.label, style: t.bodySmall?.copyWith(color: g.ink2)),
-              Text('Rp ${fmtRupiah(widget.nominal)}', style: t.titleLarge?.copyWith(fontFeatures: const [FontFeature.tabularFigures()])),
+              Text(
+                widget.jenis.label,
+                style: t.bodySmall?.copyWith(color: g.ink2),
+              ),
+              Text(
+                'Rp ${fmtRupiah(widget.nominal)}',
+                style: t.titleLarge?.copyWith(
+                  fontFeatures: const [FontFeature.tabularFigures()],
+                ),
+              ),
               const SizedBox(height: 24),
               Text('Kategori', style: t.bodySmall?.copyWith(color: g.ink2)),
               const SizedBox(height: 4),
@@ -214,14 +301,22 @@ class _TransaksiKategoriScreenState extends State<TransaksiKategoriScreen> {
                     ),
                 ],
               ),
-              if (!masuk && _kategori != null) _SisaBudget(kategoriId: _kategori!, nominal: widget.nominal, tanggal: _tanggal),
+              if (!masuk && _kategori != null)
+                _SisaBudget(
+                  kategoriId: _kategori!,
+                  nominal: widget.nominal,
+                  tanggal: _tanggal,
+                ),
               const SizedBox(height: 12),
               BarisPilih(
                 key: const Key('transaksi.kantong'),
                 label: masuk ? 'Ke kantong' : 'Dari kantong',
                 nilai: namaKantong(context, _kantong),
                 onTap: () async {
-                  final id = await pilihKantong(context, judul: masuk ? 'Ke kantong' : 'Dari kantong');
+                  final id = await pilihKantong(
+                    context,
+                    judul: masuk ? 'Ke kantong' : 'Dari kantong',
+                  );
                   if (id != null) setState(() => _kantong = id);
                 },
               ),
@@ -243,12 +338,19 @@ class _TransaksiKategoriScreenState extends State<TransaksiKategoriScreen> {
                 key: const Key('transaksi.catatan'),
                 controller: _catatan,
                 textCapitalization: TextCapitalization.sentences,
-                decoration: const InputDecoration(labelText: 'Catatan', hintText: 'Nasi padang'),
+                decoration: const InputDecoration(
+                  labelText: 'Catatan',
+                  hintText: 'Nasi padang',
+                ),
               ),
               const Spacer(),
               Padding(
                 padding: const EdgeInsets.only(bottom: 24),
-                child: FilledButton(key: const Key('transaksi.simpan'), onPressed: _simpan, child: const Text('Simpan')),
+                child: FilledButton(
+                  key: const Key('transaksi.simpan'),
+                  onPressed: _simpan,
+                  child: const Text('Simpan'),
+                ),
               ),
             ],
           ),
@@ -260,21 +362,38 @@ class _TransaksiKategoriScreenState extends State<TransaksiKategoriScreen> {
 
 /// Sisa budget kategori setelah transaksi ini (FR-07). Kosong kalau kategori tanpa budget.
 class _SisaBudget extends StatelessWidget {
-  const _SisaBudget({required this.kategoriId, required this.nominal, required this.tanggal});
+  const _SisaBudget({
+    required this.kategoriId,
+    required this.nominal,
+    required this.tanggal,
+  });
   final int kategoriId, nominal;
   final String tanggal;
 
   @override
   Widget build(BuildContext context) {
     final g = context.gemi;
-    final sisa = context.watch<BudgetController>().sisaSetelah(kategoriId: kategoriId, nominal: nominal, bulan: tanggal.substring(0, 7));
+    final sisa = context.watch<BudgetController>().sisaSetelah(
+      kategoriId: kategoriId,
+      nominal: nominal,
+      bulan: tanggal.substring(0, 7),
+    );
     if (sisa == null) return const SizedBox.shrink();
-    final nama = context.read<TransaksiController>().kategori(JenisTransaksi.expense).where((k) => k.id == kategoriId).firstOrNull?.name ?? '';
+    final nama =
+        context
+            .read<TransaksiController>()
+            .kategori(JenisTransaksi.expense)
+            .where((k) => k.id == kategoriId)
+            .firstOrNull
+            ?.name ??
+        '';
     return Padding(
       padding: const EdgeInsets.only(top: 8),
       child: Text(
         key: const Key('transaksi.sisaBudget'),
-        sisa < 0 ? 'Lewat budget $nama ${fmtRupiah(-sisa)} setelah ini' : 'Sisa budget $nama ${fmtRupiah(sisa)} setelah ini',
+        sisa < 0
+            ? 'Lewat budget $nama ${fmtRupiah(-sisa)} setelah ini'
+            : 'Sisa budget $nama ${fmtRupiah(sisa)} setelah ini',
         style: TextStyle(fontSize: 12, color: sisa < 0 ? g.over : g.income),
       ),
     );
@@ -298,17 +417,28 @@ Future<void> simpanTransaksi(
   final int id;
   try {
     id = await c.tambah(
-        jenis: jenis, nominal: nominal, kantongId: kantongId, kantongTujuanId: kantongTujuanId, kategoriId: kategoriId, tanggal: tanggal, catatan: catatan);
+      jenis: jenis,
+      nominal: nominal,
+      kantongId: kantongId,
+      kantongTujuanId: kantongTujuanId,
+      kategoriId: kategoriId,
+      tanggal: tanggal,
+      catatan: catatan,
+    );
   } on ArgumentError catch (e) {
-    messenger.showSnackBar(SnackBar(content: Text(e.message.toString().split(': ').last)));
+    messenger.showSnackBar(
+      SnackBar(content: Text(e.message.toString().split(': ').last)),
+    );
     return;
   }
   nav.popUntil((r) => r.isFirst);
-  messenger.showSnackBar(SnackBar(
-    content: const Text('Transaksi tersimpan'),
-    duration: const Duration(seconds: 4),
-    action: SnackBarAction(label: 'Batalkan', onPressed: () => c.hapus(id)),
-  ));
+  messenger.showSnackBar(
+    SnackBar(
+      content: const Text('Transaksi tersimpan'),
+      duration: const Duration(seconds: 4),
+      action: SnackBarAction(label: 'Batalkan', onPressed: () => c.hapus(id)),
+    ),
+  );
 }
 
 /// Pilihan jenis, gaya tab garis bawah (tokens .seg).
@@ -322,7 +452,9 @@ class _Segmen extends StatelessWidget {
     final g = context.gemi;
     final ink = Theme.of(context).colorScheme.onSurface;
     return Container(
-      decoration: BoxDecoration(border: Border(bottom: BorderSide(color: g.rule))),
+      decoration: BoxDecoration(
+        border: Border(bottom: BorderSide(color: g.rule)),
+      ),
       child: Row(
         children: [
           for (final j in JenisTransaksi.values)
@@ -334,8 +466,21 @@ class _Segmen extends StatelessWidget {
                 child: Container(
                   height: 40,
                   alignment: Alignment.center,
-                  decoration: BoxDecoration(border: Border(bottom: BorderSide(color: j == nilai ? ink : Colors.transparent, width: 2))),
-                  child: Text(j.label, style: TextStyle(color: j == nilai ? ink : g.ink2, fontWeight: j == nilai ? FontWeight.w500 : null)),
+                  decoration: BoxDecoration(
+                    border: Border(
+                      bottom: BorderSide(
+                        color: j == nilai ? ink : Colors.transparent,
+                        width: 2,
+                      ),
+                    ),
+                  ),
+                  child: Text(
+                    j.label,
+                    style: TextStyle(
+                      color: j == nilai ? ink : g.ink2,
+                      fontWeight: j == nilai ? FontWeight.w500 : null,
+                    ),
+                  ),
                 ),
               ),
             ),
@@ -349,11 +494,26 @@ class _Keypad extends StatelessWidget {
   const _Keypad({required this.onKetik});
   final ValueChanged<String> onKetik;
 
-  static const _tombol = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '000', '0', '⌫'];
+  static const _tombol = [
+    '1',
+    '2',
+    '3',
+    '4',
+    '5',
+    '6',
+    '7',
+    '8',
+    '9',
+    '000',
+    '0',
+    '⌫',
+  ];
 
   @override
   Widget build(BuildContext context) {
-    final surface2 = Theme.of(context).brightness == Brightness.dark ? const Color(0xFF222925) : const Color(0xFFF6F7F5);
+    final surface2 = Theme.of(context).brightness == Brightness.dark
+        ? const Color(0xFF222925)
+        : const Color(0xFFF6F7F5);
     return GridView.count(
       crossAxisCount: 3,
       shrinkWrap: true,
@@ -370,7 +530,9 @@ class _Keypad extends StatelessWidget {
               key: Key('transaksi.keypad.$k'),
               borderRadius: BorderRadius.circular(6),
               onTap: () => onKetik(k),
-              child: Center(child: Text(k, style: const TextStyle(fontSize: 22))),
+              child: Center(
+                child: Text(k, style: const TextStyle(fontSize: 22)),
+              ),
             ),
           ),
       ],

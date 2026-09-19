@@ -37,21 +37,24 @@ class _TransaksiUbahScreenState extends State<TransaksiUbahScreen> {
     super.dispose();
   }
 
-  void _pesan(String s) => ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(s)));
+  void _pesan(String s) =>
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(s)));
 
   Future<void> _simpan() async {
     final c = context.read<TransaksiController>();
     final nav = Navigator.of(context);
     final messenger = ScaffoldMessenger.of(context);
     try {
-      await c.ubah(t.id,
-          jenis: t.type,
-          nominal: parseRupiah(_nominal.text),
-          kantongId: _kantong,
-          kantongTujuanId: _tujuan,
-          kategoriId: _kategori,
-          tanggal: _tanggal,
-          catatan: _catatan.text);
+      await c.ubah(
+        t.id,
+        jenis: t.type,
+        nominal: parseRupiah(_nominal.text),
+        kantongId: _kantong,
+        kantongTujuanId: _tujuan,
+        kategoriId: _kategori,
+        tanggal: _tanggal,
+        catatan: _catatan.text,
+      );
     } on ArgumentError catch (e) {
       _pesan(e.message.toString().split(': ').last);
       return;
@@ -67,8 +70,15 @@ class _TransaksiUbahScreenState extends State<TransaksiUbahScreen> {
         title: const Text('Hapus transaksi ini?'),
         content: const Text('Saldo kantong ikut dikoreksi.'),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Batal')),
-          TextButton(key: const Key('transaksi.hapus.ya'), onPressed: () => Navigator.pop(ctx, true), child: const Text('Hapus')),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: const Text('Batal'),
+          ),
+          TextButton(
+            key: const Key('transaksi.hapus.ya'),
+            onPressed: () => Navigator.pop(ctx, true),
+            child: const Text('Hapus'),
+          ),
         ],
       ),
     );
@@ -88,21 +98,42 @@ class _TransaksiUbahScreenState extends State<TransaksiUbahScreen> {
     final masuk = t.type == JenisTransaksi.income;
     return Scaffold(
       appBar: AppBar(
-        leading: TextButton(onPressed: () => Navigator.pop(context), child: const Text('‹ Kembali')),
+        leading: TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: const Text('‹ Kembali'),
+        ),
         leadingWidth: 110,
-        actions: [Padding(padding: const EdgeInsets.only(right: 24), child: Center(child: Text(t.type.label, style: th.bodySmall?.copyWith(color: g.ink2))))],
+        actions: [
+          Padding(
+            padding: const EdgeInsets.only(right: 24),
+            child: Center(
+              child: Text(
+                t.type.label,
+                style: th.bodySmall?.copyWith(color: g.ink2),
+              ),
+            ),
+          ),
+        ],
       ),
       body: SafeArea(
         child: ListView(
           padding: const EdgeInsets.symmetric(horizontal: 24),
           children: [
-            Padding(padding: const EdgeInsets.only(top: 8, bottom: 16), child: Text('Ubah transaksi', style: th.titleLarge)),
+            Padding(
+              padding: const EdgeInsets.only(top: 8, bottom: 16),
+              child: Text('Ubah transaksi', style: th.titleLarge),
+            ),
             TextField(
               key: const Key('transaksi.nominal'),
               controller: _nominal,
               keyboardType: TextInputType.number,
-              inputFormatters: [FilteringTextInputFormatter.digitsOnly, RibuanFormatter()],
-              style: th.displaySmall?.copyWith(fontFeatures: const [FontFeature.tabularFigures()]),
+              inputFormatters: [
+                FilteringTextInputFormatter.digitsOnly,
+                RibuanFormatter(),
+              ],
+              style: th.displaySmall?.copyWith(
+                fontFeatures: const [FontFeature.tabularFigures()],
+              ),
               decoration: const InputDecoration(labelText: 'Nominal'),
             ),
             if (!_transfer) ...[
@@ -129,7 +160,10 @@ class _TransaksiUbahScreenState extends State<TransaksiUbahScreen> {
               label: masuk ? 'Ke kantong' : 'Dari kantong',
               nilai: namaKantong(context, _kantong),
               onTap: () async {
-                final id = await pilihKantong(context, judul: masuk ? 'Ke kantong' : 'Dari kantong');
+                final id = await pilihKantong(
+                  context,
+                  judul: masuk ? 'Ke kantong' : 'Dari kantong',
+                );
                 if (id != null) setState(() => _kantong = id);
               },
             ),
@@ -148,7 +182,12 @@ class _TransaksiUbahScreenState extends State<TransaksiUbahScreen> {
               label: 'Tanggal',
               nilai: fmtTanggal(_tanggal),
               onTap: () async {
-                final d = await showDatePicker(context: context, initialDate: DateTime.parse(_tanggal), firstDate: DateTime(2000), lastDate: DateTime.now());
+                final d = await showDatePicker(
+                  context: context,
+                  initialDate: DateTime.parse(_tanggal),
+                  firstDate: DateTime(2000),
+                  lastDate: DateTime.now(),
+                );
                 if (d != null) setState(() => _tanggal = ymd(d));
               },
             ),
@@ -159,12 +198,23 @@ class _TransaksiUbahScreenState extends State<TransaksiUbahScreen> {
               decoration: const InputDecoration(labelText: 'Catatan'),
             ),
             const SizedBox(height: 32),
-            FilledButton(key: const Key('transaksi.simpanUbah'), onPressed: _simpan, child: const Text('Simpan perubahan')),
+            FilledButton(
+              key: const Key('transaksi.simpanUbah'),
+              onPressed: _simpan,
+              child: const Text('Simpan perubahan'),
+            ),
             const SizedBox(height: 8),
             OutlinedButton(
               key: const Key('transaksi.hapus'),
               onPressed: _hapus,
-              style: OutlinedButton.styleFrom(foregroundColor: g.over, minimumSize: const Size.fromHeight(44), side: BorderSide(color: g.rule), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6))),
+              style: OutlinedButton.styleFrom(
+                foregroundColor: g.over,
+                minimumSize: const Size.fromHeight(44),
+                side: BorderSide(color: g.rule),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(6),
+                ),
+              ),
               child: const Text('Hapus transaksi'),
             ),
             const SizedBox(height: 24),

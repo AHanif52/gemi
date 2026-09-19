@@ -29,7 +29,12 @@ class Transactions extends Table {
 
 /// Satu baris daftar: transaksi + nama kategori/kantong hasil JOIN. Dipakai screen.
 class TransaksiBaris {
-  const TransaksiBaris(this.t, {this.kategori, required this.kantong, this.kantongTujuan});
+  const TransaksiBaris(
+    this.t, {
+    this.kategori,
+    required this.kantong,
+    this.kantongTujuan,
+  });
   final Transaksi t;
   final Kategori? kategori;
   final Kantong kantong;
@@ -39,9 +44,10 @@ class TransaksiBaris {
   String get judul => t.note?.isNotEmpty == true
       ? t.note!
       : t.type == JenisTransaksi.transfer
-          ? 'Ke ${kantongTujuan?.name ?? '?'}'
-          : kategori?.name ?? '?';
+      ? 'Ke ${kantongTujuan?.name ?? '?'}'
+      : kategori?.name ?? '?';
 
-  String get sub =>
-      t.type == JenisTransaksi.transfer ? '${kantong.name} ke ${kantongTujuan?.name ?? '?'}' : '${kategori?.name ?? '?'} · ${kantong.name}';
+  String get sub => t.type == JenisTransaksi.transfer
+      ? '${kantong.name} ke ${kantongTujuan?.name ?? '?'}'
+      : '${kategori?.name ?? '?'} · ${kantong.name}';
 }
