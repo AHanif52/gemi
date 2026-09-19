@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:local_auth/local_auth.dart';
 import 'package:provider/provider.dart';
 
 import 'app/database.dart';
@@ -29,6 +31,7 @@ import 'pengaturan/pengaturan_repository.dart';
 import 'pengaturan/pengaturan_screen.dart';
 import 'pengaturan/sembunyi_controller.dart';
 import 'pengingat/pengingat_controller.dart';
+import 'pengingat/penjadwal.dart';
 import 'pengingat/pengingat_screen.dart';
 import 'tampilan/tampilan_controller.dart';
 import 'tampilan/tampilan_screen.dart';
@@ -38,7 +41,17 @@ import 'transaksi/transaksi_repository.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  final db = await GemiDatabase.buka();
+  runApp(await rakitApp(await GemiDatabase.buka()));
+}
+
+/// Rakit seluruh pohon controller + provider di atas [db]. Test memanggil ini
+/// dengan DB in-memory dan seam palsu (penjadwal, secure storage, biometrik).
+Future<Widget> rakitApp(
+  GemiDatabase db, {
+  Penjadwal? penjadwal,
+  FlutterSecureStorage? storageKunci,
+  LocalAuthentication? auth,
+}) async {
   final kantong = KantongController(KantongRepository(db))..muat();
   final kategoriRepo = KategoriRepository(db);
   final kategori = KategoriController(kategoriRepo)..muat();
@@ -58,7 +71,10 @@ Future<void> main() async {
   final pengaturanRepo = PengaturanRepository(db);
   final sembunyi = SembunyiController(pengaturanRepo)..muat();
   final tampilan = TampilanController(pengaturanRepo)..muat();
-  final pengingat = PengingatController(pengaturanRepo);
+  final pengingat = PengingatController(
+    pengaturanRepo,
+    penjadwal ?? PenjadwalNotifikasi(),
+  );
   // FR-17: setiap transaksi berubah, jadwal pengingat dihitung ulang.
   bool adaHariIni() => transaksi.daftar.any((b) => b.t.date == hariIni());
   transaksi.addListener(
@@ -70,24 +86,25 @@ Future<void> main() async {
     BackupService(),
     pengaturanRepo,
   )..muat();
-  final kunci = KunciController(KunciRepository(pengaturanRepo))..muat();
-  runApp(
-    MultiProvider(
-      providers: [
-        ChangeNotifierProvider.value(value: kantong),
-        ChangeNotifierProvider.value(value: transaksi),
-        ChangeNotifierProvider.value(value: budget),
-        Provider.value(value: budgetRepo),
-        ChangeNotifierProvider.value(value: laporan),
-        ChangeNotifierProvider.value(value: kategori),
-        ChangeNotifierProvider.value(value: backup),
-        ChangeNotifierProvider.value(value: sembunyi),
-        ChangeNotifierProvider.value(value: tampilan),
-        ChangeNotifierProvider.value(value: pengingat),
-        ChangeNotifierProvider.value(value: kunci),
-      ],
-      child: const GemiApp(),
-    ),
+  final kunci = KunciController(
+    KunciRepository(pengaturanRepo, storage: storageKunci),
+    auth: auth,
+  )..muat();
+  return MultiProvider(
+    providers: [
+      ChangeNotifierProvider.value(value: kantong),
+      ChangeNotifierProvider.value(value: transaksi),
+      ChangeNotifierProvider.value(value: budget),
+      Provider.value(value: budgetRepo),
+      ChangeNotifierProvider.value(value: laporan),
+      ChangeNotifierProvider.value(value: kategori),
+      ChangeNotifierProvider.value(value: backup),
+      ChangeNotifierProvider.value(value: sembunyi),
+      ChangeNotifierProvider.value(value: tampilan),
+      ChangeNotifierProvider.value(value: pengingat),
+      ChangeNotifierProvider.value(value: kunci),
+    ],
+    child: const GemiApp(),
   );
 }
 

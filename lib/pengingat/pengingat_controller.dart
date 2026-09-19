@@ -1,24 +1,23 @@
 import 'package:flutter/foundation.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:timezone/data/latest.dart' as tzdata;
-import 'package:timezone/timezone.dart' as tz;
 
 import '../pengaturan/pengaturan_repository.dart';
+import 'penjadwal.dart';
 
 /// FR-17: notifikasi lokal tiap hari pada [jam] kalau hari itu belum ada transaksi.
 /// Tanpa server. Dijadwalkan ulang setiap transaksi berubah: kalau hari ini sudah
 /// mencatat, jadwal mulai besok; jadwal berulang harian sampai dijadwalkan ulang.
 class PengingatController extends ChangeNotifier {
-  PengingatController(this._setelan, [FlutterLocalNotificationsPlugin? plugin])
-    : _plugin = plugin ?? FlutterLocalNotificationsPlugin();
+  PengingatController(this._setelan, this._penjadwal);
   final PengaturanRepository _setelan;
-  final FlutterLocalNotificationsPlugin _plugin;
+  final Penjadwal _penjadwal;
 
   static const _kunciAktif = 'pengingat_aktif', _kunciJam = 'pengingat_jam';
-  static const _id = 1;
+  static const isiNotifikasi =
+      'Belum ada transaksi hari ini. Ada pengeluaran yang belum dicatat?';
 
   bool _aktif = true;
   String _jam = '21:00'; // HH:MM
+  Future<void>? _persiapan;
 
   bool get aktif => _aktif;
   String get jam => _jam;
@@ -46,35 +45,6 @@ class PengingatController extends ChangeNotifier {
     await jadwalkan(adaTransaksiHariIni: adaTransaksiHariIni);
   }
 
-  Future<void>? _persiapan;
-
-  /// Sekali saja walau dipanggil paralel (listener transaksi bisa menembak berkali-kali).
-  Future<void> _siapkan() => _persiapan ??= _siapkanSekali();
-
-  Future<void> _siapkanSekali() async {
-    tzdata.initializeTimeZones();
-    // Android butuh ID zona IANA. Tanpa package tambahan: pakai Etc/GMT dari offset lokal
-    // (tanda dibalik: WIB +7 = "Etc/GMT-7"). Semua zona Indonesia offset jam bulat.
-    // ponytail: zona setengah jam (mis. India) dibulatkan; ganti ke flutter_timezone kalau perlu.
-    final jam = DateTime.now().timeZoneOffset.inMinutes ~/ 60;
-    tz.setLocalLocation(
-      tz.getLocation(
-        jam == 0 ? 'Etc/GMT' : 'Etc/GMT${jam > 0 ? '-' : '+'}${jam.abs()}',
-      ),
-    );
-    await _plugin.initialize(
-      settings: const InitializationSettings(
-        android: AndroidInitializationSettings('@mipmap/ic_launcher'),
-        iOS: DarwinInitializationSettings(),
-      ),
-    );
-    await _plugin
-        .resolvePlatformSpecificImplementation<
-          AndroidFlutterLocalNotificationsPlugin
-        >()
-        ?.requestNotificationsPermission();
-  }
-
   /// Hitung waktu pengingat berikutnya (murni, bisa dites).
   static DateTime berikutnya({
     required DateTime sekarang,
@@ -91,31 +61,18 @@ class PengingatController extends ChangeNotifier {
   }
 
   Future<void> jadwalkan({required bool adaTransaksiHariIni}) async {
-    await _siapkan();
-    await _plugin.cancel(id: _id);
+    // Sekali saja walau dipanggil paralel (listener transaksi bisa menembak berkali-kali).
+    await (_persiapan ??= _penjadwal.siapkan());
+    await _penjadwal.batal();
     if (!_aktif) return;
-    final t = berikutnya(
-      sekarang: DateTime.now(),
-      jam: _jam,
-      adaTransaksiHariIni: adaTransaksiHariIni,
-    );
-    await _plugin.zonedSchedule(
-      id: _id,
-      title: 'Gemi',
-      body: 'Belum ada transaksi hari ini. Ada pengeluaran yang belum dicatat?',
-      scheduledDate: tz.TZDateTime.from(t, tz.local),
-      notificationDetails: const NotificationDetails(
-        android: AndroidNotificationDetails(
-          'pengingat',
-          'Pengingat harian',
-          channelDescription:
-              'Mengingatkan mencatat kalau hari itu belum ada transaksi',
-        ),
-        iOS: DarwinNotificationDetails(),
+    await _penjadwal.jadwalHarian(
+      berikutnya(
+        sekarang: DateTime.now(),
+        jam: _jam,
+        adaTransaksiHariIni: adaTransaksiHariIni,
       ),
-      // Tidak perlu izin exact alarm; meleset beberapa menit tidak masalah.
-      androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
-      matchDateTimeComponents: DateTimeComponents.time,
+      judul: 'Gemi',
+      isi: isiNotifikasi,
     );
   }
 }

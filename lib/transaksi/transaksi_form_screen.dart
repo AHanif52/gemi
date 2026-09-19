@@ -456,36 +456,40 @@ class _Segmen extends StatelessWidget {
       decoration: BoxDecoration(
         border: Border(bottom: BorderSide(color: g.rule)),
       ),
-      child: Row(
-        children: [
-          for (final j in JenisTransaksi.values)
-            Padding(
-              padding: const EdgeInsets.only(right: 24),
-              child: InkWell(
-                key: Key('transaksi.jenis.${j.name}'),
-                onTap: () => onPilih(j),
-                child: Container(
-                  height: 40,
-                  alignment: Alignment.center,
-                  decoration: BoxDecoration(
-                    border: Border(
-                      bottom: BorderSide(
-                        color: j == nilai ? ink : Colors.transparent,
-                        width: 2,
+      // Bisa digeser kalau teks sistem diperbesar (NFR-09) supaya tidak terpotong.
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: Row(
+          children: [
+            for (final j in JenisTransaksi.values)
+              Padding(
+                padding: const EdgeInsets.only(right: 24),
+                child: InkWell(
+                  key: Key('transaksi.jenis.${j.name}'),
+                  onTap: () => onPilih(j),
+                  child: Container(
+                    height: 40,
+                    alignment: Alignment.center,
+                    decoration: BoxDecoration(
+                      border: Border(
+                        bottom: BorderSide(
+                          color: j == nilai ? ink : Colors.transparent,
+                          width: 2,
+                        ),
                       ),
                     ),
-                  ),
-                  child: Text(
-                    j.label,
-                    style: TextStyle(
-                      color: j == nilai ? ink : g.ink2,
-                      fontWeight: j == nilai ? FontWeight.w500 : null,
+                    child: Text(
+                      j.label,
+                      style: TextStyle(
+                        color: j == nilai ? ink : g.ink2,
+                        fontWeight: j == nilai ? FontWeight.w500 : null,
+                      ),
                     ),
                   ),
                 ),
               ),
-            ),
-        ],
+          ],
+        ),
       ),
     );
   }
