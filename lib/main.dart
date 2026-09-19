@@ -11,6 +11,9 @@ import 'kantong/kantong_form_screen.dart';
 import 'kantong/kantong_repository.dart';
 import 'kantong/kantong_screen.dart';
 import 'kategori/kategori_repository.dart';
+import 'laporan/laporan_controller.dart';
+import 'laporan/laporan_repository.dart';
+import 'laporan/laporan_screen.dart';
 import 'transaksi/transaksi_controller.dart';
 import 'transaksi/transaksi_form_screen.dart';
 import 'transaksi/transaksi_repository.dart';
@@ -19,11 +22,17 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   final db = await GemiDatabase.buka();
   final kantong = KantongController(KantongRepository(db))..muat();
-  final transaksi = TransaksiController(TransaksiRepository(db), KategoriRepository(db), kantong)..muat();
+  final transaksi = TransaksiController(
+    TransaksiRepository(db),
+    KategoriRepository(db),
+    kantong,
+  )..muat();
   final budgetRepo = BudgetRepository(db);
   final budget = BudgetController(budgetRepo);
   // Terpakai per kategori berubah tiap transaksi berubah.
   transaksi.addListener(budget.muat);
+  final laporan = LaporanController(LaporanRepository(db));
+  transaksi.addListener(laporan.muat);
   runApp(
     MultiProvider(
       providers: [
@@ -31,6 +40,7 @@ Future<void> main() async {
         ChangeNotifierProvider.value(value: transaksi),
         ChangeNotifierProvider.value(value: budget),
         Provider.value(value: budgetRepo),
+        ChangeNotifierProvider.value(value: laporan),
       ],
       child: const GemiApp(),
     ),
@@ -52,6 +62,10 @@ class GemiApp extends StatelessWidget {
         '/transaksi': (_) => const Shell(tab: 1),
         '/transaksi/baru': (_) => const TransaksiFormScreen(),
         '/budget': (_) => const Shell(tab: 2),
+        '/laporan': (_) => const Shell(tab: 3),
+        '/laporan/hari': (_) => const Shell(tab: 3, periode: Periode.hari),
+        '/laporan/minggu': (_) => const Shell(tab: 3, periode: Periode.minggu),
+        '/laporan/bulan': (_) => const Shell(tab: 3, periode: Periode.bulan),
         '/mulai': (_) => const KantongFormScreen(pertama: true),
         '/kantong': (_) => const KantongScreen(),
         '/kantong/baru': (_) => const KantongFormScreen(),

@@ -15,6 +15,11 @@ class GemiColors extends ThemeExtension<GemiColors> {
 
   final Color ink2, ink3, rule, income, over, near;
 
+  /// Warna kategori cat-1..cat-5 + cat-other, indeks = kolom `color` di tabel categories.
+  static const _katLight = [Color(0xFF1F7A52), Color(0xFF2F5FA8), Color(0xFFB8862B), Color(0xFF8A4FA3), Color(0xFFC4553A), Color(0xFF6B756F)];
+  static const _katDark = [Color(0xFF3FA574), Color(0xFF5F88D0), Color(0xFFB4862E), Color(0xFFA97AC2), Color(0xFFD06A50), Color(0xFF7E8882)];
+  Color kategori(int i) => (this == light ? _katLight : _katDark)[i.clamp(0, 5)];
+
   static const light = GemiColors(
     ink2: Color(0xFF5E6863),
     ink3: Color(0xFF8C948F),

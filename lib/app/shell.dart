@@ -2,14 +2,16 @@ import 'package:flutter/material.dart';
 
 import '../beranda/beranda_screen.dart';
 import '../budget/budget_screen.dart';
+import '../laporan/laporan_screen.dart';
 import '../transaksi/transaksi_list_screen.dart';
 import '../widgets/ikon_gemi.dart';
 import 'theme.dart';
 
-/// Empat tab utama + tombol tambah (BRD: Navigasi utama). Laporan menyusul.
+/// Empat tab utama + tombol tambah (BRD: Navigasi utama).
 class Shell extends StatefulWidget {
-  const Shell({super.key, this.tab = 0});
+  const Shell({super.key, this.tab = 0, this.periode = Periode.minggu});
   final int tab;
+  final Periode periode;
 
   @override
   State<Shell> createState() => _ShellState();
@@ -18,19 +20,17 @@ class Shell extends StatefulWidget {
 class _ShellState extends State<Shell> {
   late int _tab = widget.tab;
 
-  static const _layar = [
-    BerandaScreen(),
-    TransaksiListScreen(),
-    BudgetScreen(),
-    _Menyusul('Laporan'),
-  ];
-
   @override
   Widget build(BuildContext context) {
     final g = context.gemi;
     final ink = Theme.of(context).colorScheme.onSurface;
     return Scaffold(
-      body: _layar[_tab],
+      body: switch (_tab) {
+        0 => const BerandaScreen(),
+        1 => const TransaksiListScreen(),
+        2 => const BudgetScreen(),
+        _ => LaporanScreen(periode: widget.periode),
+      },
       floatingActionButton: _tab == 2
           ? null
           : FloatingActionButton(
@@ -89,17 +89,4 @@ class _ShellState extends State<Shell> {
       ),
     );
   }
-}
-
-class _Menyusul extends StatelessWidget {
-  const _Menyusul(this.judul);
-  final String judul;
-
-  @override
-  Widget build(BuildContext context) => Scaffold(
-    appBar: AppBar(title: Text(judul)),
-    body: Center(
-      child: Text('Menyusul', style: TextStyle(color: context.gemi.ink2)),
-    ),
-  );
 }

@@ -58,3 +58,21 @@ int hariSisa(String s, {DateTime? sekarang}) {
   if (ym(now) == s) return akhir - now.day;
   return DateTime(y, m).isAfter(now) ? akhir : 0;
 }
+
+/// Nominal ringkas untuk sumbu grafik: 1.240.000 -> "1,2 jt", 980.000 -> "980 rb", 500 -> "500".
+String fmtRingkas(int n) {
+  if (n >= 1000000) return '${(n / 1000000).toStringAsFixed(n % 1000000 == 0 ? 0 : 1).replaceAll('.', ',')} jt';
+  if (n >= 1000) return '${(n / 1000).round()} rb';
+  return '$n';
+}
+
+/// Senin di minggu yang memuat [d].
+DateTime awalMinggu(DateTime d) => DateTime(d.year, d.month, d.day - (d.weekday - 1));
+
+/// "14 – 20 Sep" atau "29 Sep – 5 Okt" untuk minggu yang dimulai [senin].
+String fmtRentangMinggu(DateTime senin) {
+  final minggu = senin.add(const Duration(days: 6));
+  return senin.month == minggu.month
+      ? '${senin.day} – ${minggu.day} ${_bulan[senin.month - 1]}'
+      : '${senin.day} ${_bulan[senin.month - 1]} – ${minggu.day} ${_bulan[minggu.month - 1]}';
+}
