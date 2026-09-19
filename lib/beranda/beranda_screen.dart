@@ -2,12 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../app/format.dart';
+import '../budget/budget_controller.dart';
 import '../kantong/kantong_controller.dart';
 import '../transaksi/transaksi_controller.dart';
 import '../transaksi/transaksi_list_screen.dart';
 import '../widgets/baris_gemi.dart';
+import '../widgets/hero_gemi.dart';
 
-/// /beranda — baris kantong + catatan hari ini dan kemarin. Sisa budget menyusul (0.2).
+/// /beranda — sisa budget bulan ini, baris kantong, catatan hari ini dan kemarin.
 class BerandaScreen extends StatelessWidget {
   const BerandaScreen({super.key});
 
@@ -15,6 +17,9 @@ class BerandaScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final kantong = context.watch<KantongController>();
     final transaksi = context.watch<TransaksiController>();
+    final bulan = bulanIni();
+    final budget = context.watch<BudgetController>().data(bulan);
+    final sisaHari = hariSisa(bulan);
     final kemarin = ymd(DateTime.now().subtract(const Duration(days: 1)));
     final terbaru = transaksi.daftar.where((b) => b.t.date.compareTo(kemarin) >= 0).toList();
     return Scaffold(
@@ -22,6 +27,16 @@ class BerandaScreen extends StatelessWidget {
       body: ListView(
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
         children: [
+          if (budget != null && budget.adaBudget)
+            HeroGemi(
+              label: 'Sisa budget ${fmtBulan(bulan, pendek: true)}',
+              nilai: 'Rp ${fmtRupiah(budget.sisa)}',
+              delta: budget.sisa < 0
+                  ? 'Lewat ${fmtRupiah(-budget.sisa)}'
+                  : sisaHari > 0
+                      ? '$sisaHari hari lagi · sekitar ${fmtRupiah((budget.sisa / sisaHari / 1000).round() * 1000)} per hari'
+                      : 'Hari terakhir bulan ini',
+            ),
           BarisTautan(
             key: const Key('kantong.lihat'),
             label: 'Semua kantong',

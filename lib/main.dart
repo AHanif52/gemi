@@ -4,6 +4,8 @@ import 'package:provider/provider.dart';
 import 'app/database.dart';
 import 'app/shell.dart';
 import 'app/theme.dart';
+import 'budget/budget_controller.dart';
+import 'budget/budget_repository.dart';
 import 'kantong/kantong_controller.dart';
 import 'kantong/kantong_form_screen.dart';
 import 'kantong/kantong_repository.dart';
@@ -18,11 +20,17 @@ Future<void> main() async {
   final db = await GemiDatabase.buka();
   final kantong = KantongController(KantongRepository(db))..muat();
   final transaksi = TransaksiController(TransaksiRepository(db), KategoriRepository(db), kantong)..muat();
+  final budgetRepo = BudgetRepository(db);
+  final budget = BudgetController(budgetRepo);
+  // Terpakai per kategori berubah tiap transaksi berubah.
+  transaksi.addListener(budget.muat);
   runApp(
     MultiProvider(
       providers: [
         ChangeNotifierProvider.value(value: kantong),
         ChangeNotifierProvider.value(value: transaksi),
+        ChangeNotifierProvider.value(value: budget),
+        Provider.value(value: budgetRepo),
       ],
       child: const GemiApp(),
     ),
@@ -43,6 +51,7 @@ class GemiApp extends StatelessWidget {
         '/beranda': (_) => const Shell(),
         '/transaksi': (_) => const Shell(tab: 1),
         '/transaksi/baru': (_) => const TransaksiFormScreen(),
+        '/budget': (_) => const Shell(tab: 2),
         '/mulai': (_) => const KantongFormScreen(pertama: true),
         '/kantong': (_) => const KantongScreen(),
         '/kantong/baru': (_) => const KantongFormScreen(),

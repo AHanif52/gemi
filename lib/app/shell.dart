@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 
 import '../beranda/beranda_screen.dart';
+import '../budget/budget_screen.dart';
 import '../transaksi/transaksi_list_screen.dart';
 import 'theme.dart';
 
-/// Empat tab utama + tombol tambah (BRD: Navigasi utama). Budget dan Laporan menyusul.
+/// Empat tab utama + tombol tambah (BRD: Navigasi utama). Laporan menyusul.
 class Shell extends StatefulWidget {
   const Shell({super.key, this.tab = 0});
   final int tab;
@@ -16,7 +17,7 @@ class Shell extends StatefulWidget {
 class _ShellState extends State<Shell> {
   late int _tab = widget.tab;
 
-  static const _layar = [BerandaScreen(), TransaksiListScreen(), _Menyusul('Budget'), _Menyusul('Laporan')];
+  static const _layar = [BerandaScreen(), TransaksiListScreen(), BudgetScreen(), _Menyusul('Laporan')];
 
   @override
   Widget build(BuildContext context) {
@@ -39,6 +40,7 @@ class _ShellState extends State<Shell> {
         onDestinationSelected: (i) => setState(() => _tab = i),
         backgroundColor: Theme.of(context).colorScheme.surface,
         indicatorColor: Colors.transparent,
+        iconTheme: WidgetStateProperty.resolveWith((s) => IconThemeData(color: s.contains(WidgetState.selected) ? ink : g.ink3)),
         labelTextStyle: WidgetStateProperty.resolveWith(
           (s) => TextStyle(fontSize: 12, color: s.contains(WidgetState.selected) ? ink : g.ink3, fontWeight: s.contains(WidgetState.selected) ? FontWeight.w500 : null),
         ),

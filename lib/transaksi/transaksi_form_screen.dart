@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 
 import '../app/format.dart';
 import '../app/theme.dart';
+import '../budget/budget_controller.dart';
 import '../widgets/pilih_kantong.dart';
 import 'transaksi_controller.dart';
 import 'transaksi_model.dart';
@@ -213,6 +214,7 @@ class _TransaksiKategoriScreenState extends State<TransaksiKategoriScreen> {
                     ),
                 ],
               ),
+              if (!masuk && _kategori != null) _SisaBudget(kategoriId: _kategori!, nominal: widget.nominal, tanggal: _tanggal),
               const SizedBox(height: 12),
               BarisPilih(
                 key: const Key('transaksi.kantong'),
@@ -251,6 +253,29 @@ class _TransaksiKategoriScreenState extends State<TransaksiKategoriScreen> {
             ],
           ),
         ),
+      ),
+    );
+  }
+}
+
+/// Sisa budget kategori setelah transaksi ini (FR-07). Kosong kalau kategori tanpa budget.
+class _SisaBudget extends StatelessWidget {
+  const _SisaBudget({required this.kategoriId, required this.nominal, required this.tanggal});
+  final int kategoriId, nominal;
+  final String tanggal;
+
+  @override
+  Widget build(BuildContext context) {
+    final g = context.gemi;
+    final sisa = context.watch<BudgetController>().sisaSetelah(kategoriId: kategoriId, nominal: nominal, bulan: tanggal.substring(0, 7));
+    if (sisa == null) return const SizedBox.shrink();
+    final nama = context.read<TransaksiController>().kategori(JenisTransaksi.expense).where((k) => k.id == kategoriId).firstOrNull?.name ?? '';
+    return Padding(
+      padding: const EdgeInsets.only(top: 8),
+      child: Text(
+        key: const Key('transaksi.sisaBudget'),
+        sisa < 0 ? 'Lewat budget $nama ${fmtRupiah(-sisa)} setelah ini' : 'Sisa budget $nama ${fmtRupiah(sisa)} setelah ini',
+        style: TextStyle(fontSize: 12, color: sisa < 0 ? g.over : g.income),
       ),
     );
   }

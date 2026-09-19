@@ -32,3 +32,29 @@ String fmtTanggal(String s, {DateTime? sekarang}) {
   if (beda == 1) return 'Kemarin';
   return '${_hari[d.weekday - 1]}, ${d.day} ${_bulan[d.month - 1]}';
 }
+
+const _bulanPanjang = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+
+/// DateTime -> "2026-09". Format bulan di tabel budgets.
+String ym(DateTime d) => '${d.year}-${d.month.toString().padLeft(2, '0')}';
+
+String bulanIni() => ym(DateTime.now());
+
+/// "2026-09" -> "September 2026"; [pendek] -> "September".
+String fmtBulan(String s, {bool pendek = false}) {
+  final n = _bulanPanjang[int.parse(s.substring(5, 7)) - 1];
+  return pendek ? n : '$n ${s.substring(0, 4)}';
+}
+
+/// "2026-09" ± n bulan.
+String geserBulan(String s, int n) => ym(DateTime(int.parse(s.substring(0, 4)), int.parse(s.substring(5, 7)) + n));
+
+/// Hari tersisa di bulan [s] dihitung dari [sekarang], tidak termasuk hari ini.
+/// Bulan lewat = 0; bulan mendatang = jumlah hari penuh.
+int hariSisa(String s, {DateTime? sekarang}) {
+  final now = sekarang ?? DateTime.now();
+  final y = int.parse(s.substring(0, 4)), m = int.parse(s.substring(5, 7));
+  final akhir = DateTime(y, m + 1, 0).day;
+  if (ym(now) == s) return akhir - now.day;
+  return DateTime(y, m).isAfter(now) ? akhir : 0;
+}
