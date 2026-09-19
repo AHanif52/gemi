@@ -5,6 +5,7 @@ import '../app/format.dart';
 import '../widgets/baris_gemi.dart';
 import '../widgets/hero_gemi.dart';
 import 'kantong_controller.dart';
+import 'kantong_detail_screen.dart';
 
 /// /kantong — daftar kantong + total (FR-18).
 class KantongScreen extends StatelessWidget {
@@ -25,6 +26,13 @@ class KantongScreen extends StatelessWidget {
               judul: k.name,
               sub: k.type.label,
               nominal: fmtRupiah(c.saldo(k)),
+              onTap: () => Navigator.push(
+                context,
+                MaterialPageRoute(
+                  settings: RouteSettings(name: '/kantong/${k.name}'),
+                  builder: (_) => KantongDetailScreen(k),
+                ),
+              ),
             ),
           BarisTautan(
             key: const Key('kantong.tambah'),
