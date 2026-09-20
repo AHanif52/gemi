@@ -67,7 +67,7 @@ class _LaporanScreenState extends State<LaporanScreen> {
     return Scaffold(
       appBar: AppBar(title: const Text('Laporan')),
       body: ListView(
-        padding: const EdgeInsets.symmetric(horizontal: 24),
+        padding: const EdgeInsets.fromLTRB(24, 0, 24, 88), // 88: ruang FAB
         children: [
           Container(
             decoration: BoxDecoration(
@@ -115,6 +115,7 @@ class _LaporanScreenState extends State<LaporanScreen> {
               children: [
                 IconButton(
                   key: const Key('laporan.sebelumnya'),
+                  tooltip: 'Periode sebelumnya',
                   onPressed: () => _geser(-1),
                   icon: const Icon(Icons.chevron_left),
                 ),
@@ -127,6 +128,7 @@ class _LaporanScreenState extends State<LaporanScreen> {
                 ),
                 IconButton(
                   key: const Key('laporan.berikutnya'),
+                  tooltip: 'Periode berikutnya',
                   onPressed: () => _geser(1),
                   icon: const Icon(Icons.chevron_right),
                 ),

@@ -34,6 +34,7 @@ class _BudgetScreenState extends State<BudgetScreen> {
             children: [
               IconButton(
                 key: const Key('budget.bulanLalu'),
+                tooltip: 'Bulan sebelumnya',
                 onPressed: () =>
                     setState(() => _bulan = geserBulan(_bulan, -1)),
                 icon: const Icon(Icons.chevron_left),
@@ -47,6 +48,7 @@ class _BudgetScreenState extends State<BudgetScreen> {
               ),
               IconButton(
                 key: const Key('budget.bulanDepan'),
+                tooltip: 'Bulan berikutnya',
                 onPressed: () => setState(() => _bulan = geserBulan(_bulan, 1)),
                 icon: const Icon(Icons.chevron_right),
               ),

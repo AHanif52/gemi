@@ -20,9 +20,7 @@ class PengingatScreen extends StatelessWidget {
     final g = context.gemi;
     final t = Theme.of(context).textTheme;
     final c = context.watch<PengingatController>();
-    final surface2 = Theme.of(context).brightness == Brightness.dark
-        ? const Color(0xFF222925)
-        : const Color(0xFFF6F7F5);
+    final surface2 = g.surface2;
     return Scaffold(
       appBar: AppBar(
         leading: TextButton(

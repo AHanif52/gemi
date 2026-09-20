@@ -38,6 +38,7 @@ import 'tampilan/tampilan_screen.dart';
 import 'transaksi/transaksi_controller.dart';
 import 'transaksi/transaksi_form_screen.dart';
 import 'transaksi/transaksi_repository.dart';
+import 'widgets/toast.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -140,7 +141,8 @@ class GemiApp extends StatelessWidget {
       },
       home: const _Gerbang(),
       // Kunci aplikasi (FR-16): layar PIN menutup semua route selama terkunci.
-      builder: (_, child) => _GerbangKunci(child: child!),
+      builder: (_, child) =>
+          TutupToastSaatSentuh(child: _GerbangKunci(child: child!)),
     );
   }
 }

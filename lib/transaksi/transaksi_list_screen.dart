@@ -46,7 +46,12 @@ class TransaksiListScreen extends StatelessWidget {
               ),
             )
           : ListView(
-              padding: const EdgeInsets.symmetric(horizontal: 24),
+              padding: const EdgeInsets.fromLTRB(
+                24,
+                0,
+                24,
+                88,
+              ), // 88: ruang FAB
               children: bukuKas(context, c.daftar),
             ),
     );

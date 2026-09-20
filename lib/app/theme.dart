@@ -11,9 +11,11 @@ class GemiColors extends ThemeExtension<GemiColors> {
     required this.income,
     required this.over,
     required this.near,
+    required this.surface2,
   });
 
-  final Color ink2, ink3, rule, income, over, near;
+  /// surface2: latar tombol keypad / kartu tenang (tokens --surface-2).
+  final Color ink2, ink3, rule, income, over, near, surface2;
 
   /// Warna kategori cat-1..cat-5 + cat-other, indeks = kolom `color` di tabel categories.
   static const _katLight = [
@@ -42,6 +44,7 @@ class GemiColors extends ThemeExtension<GemiColors> {
     income: Color(0xFF1F7A52),
     over: Color(0xFFB23A2B),
     near: Color(0xFF8A6414),
+    surface2: Color(0xFFF6F7F5),
   );
   static const dark = GemiColors(
     ink2: Color(0xFFA3ACA6),
@@ -50,6 +53,7 @@ class GemiColors extends ThemeExtension<GemiColors> {
     income: Color(0xFF3FA574),
     over: Color(0xFFD06A50),
     near: Color(0xFFB4862E),
+    surface2: Color(0xFF222925),
   );
 
   @override
@@ -60,6 +64,7 @@ class GemiColors extends ThemeExtension<GemiColors> {
     Color? income,
     Color? over,
     Color? near,
+    Color? surface2,
   }) => GemiColors(
     ink2: ink2 ?? this.ink2,
     ink3: ink3 ?? this.ink3,
@@ -67,6 +72,7 @@ class GemiColors extends ThemeExtension<GemiColors> {
     income: income ?? this.income,
     over: over ?? this.over,
     near: near ?? this.near,
+    surface2: surface2 ?? this.surface2,
   );
 
   @override

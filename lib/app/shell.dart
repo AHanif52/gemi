@@ -25,16 +25,21 @@ class _ShellState extends State<Shell> {
     final g = context.gemi;
     final ink = Theme.of(context).colorScheme.onSurface;
     return Scaffold(
-      body: switch (_tab) {
-        0 => const BerandaScreen(),
-        1 => const TransaksiListScreen(),
-        2 => const BudgetScreen(),
-        _ => LaporanScreen(periode: widget.periode),
-      },
+      body: SafeArea(
+        top: false,
+        bottom: false,
+        child: switch (_tab) {
+          0 => const BerandaScreen(),
+          1 => const TransaksiListScreen(),
+          2 => const BudgetScreen(),
+          _ => LaporanScreen(periode: widget.periode),
+        },
+      ),
       floatingActionButton: _tab == 2
           ? null
           : FloatingActionButton(
               key: const Key('transaksi.tambah'),
+              tooltip: 'Tambah transaksi',
               onPressed: () => Navigator.pushNamed(context, '/transaksi/baru'),
               backgroundColor: ink,
               foregroundColor: Theme.of(context).colorScheme.onPrimary,

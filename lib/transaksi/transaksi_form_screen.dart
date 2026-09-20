@@ -5,7 +5,9 @@ import '../app/format.dart';
 import '../app/theme.dart';
 import '../budget/budget_controller.dart';
 import '../widgets/keypad_gemi.dart';
+import '../widgets/kolom_isi_layar.dart';
 import '../widgets/pilih_kantong.dart';
+import '../widgets/toast.dart';
 import 'transaksi_controller.dart';
 import 'transaksi_model.dart';
 
@@ -106,8 +108,7 @@ class _TransaksiFormScreenState extends State<TransaksiFormScreen> {
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 24),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+          child: KolomIsiLayar(
             children: [
               Padding(
                 padding: const EdgeInsets.only(top: 8, bottom: 12),
@@ -143,19 +144,23 @@ class _TransaksiFormScreenState extends State<TransaksiFormScreen> {
                   ],
                 ),
               ),
-              if (transfer) ...[
-                BarisPilih(
-                  key: const Key('transaksi.kantong'),
-                  label: 'Dari kantong',
-                  nilai: namaKantong(context, _dari),
-                  onTap: () async {
-                    final id = await pilihKantong(
-                      context,
-                      judul: 'Dari kantong',
-                    );
-                    if (id != null) setState(() => _dari = id);
-                  },
-                ),
+              BarisPilih(
+                key: const Key('transaksi.kantong'),
+                label: _jenis == JenisTransaksi.income
+                    ? 'Ke kantong'
+                    : 'Dari kantong',
+                nilai: namaKantong(context, _dari),
+                onTap: () async {
+                  final id = await pilihKantong(
+                    context,
+                    judul: _jenis == JenisTransaksi.income
+                        ? 'Ke kantong'
+                        : 'Dari kantong',
+                  );
+                  if (id != null) setState(() => _dari = id);
+                },
+              ),
+              if (transfer)
                 BarisPilih(
                   key: const Key('transaksi.kantongTujuan'),
                   label: 'Ke kantong',
@@ -164,13 +169,6 @@ class _TransaksiFormScreenState extends State<TransaksiFormScreen> {
                     final id = await pilihKantong(context, judul: 'Ke kantong');
                     if (id != null) setState(() => _ke = id);
                   },
-                ),
-              ] else
-                Text(
-                  _jenis == JenisTransaksi.income
-                      ? 'Masuk ke ${namaKantong(context, _dari)}'
-                      : 'Dari ${namaKantong(context, _dari)}',
-                  style: t.bodySmall?.copyWith(color: g.ink2),
                 ),
               const Spacer(),
               KeypadGemi(onKetik: _ketik, keyPrefix: 'transaksi.keypad'),
@@ -272,8 +270,7 @@ class _TransaksiKategoriScreenState extends State<TransaksiKategoriScreen> {
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 24),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+          child: KolomIsiLayar(
             children: [
               const SizedBox(height: 8),
               Text(
@@ -401,7 +398,7 @@ class _SisaBudget extends StatelessWidget {
   }
 }
 
-/// Simpan lewat controller, kembali ke tab, toast dengan "Batalkan" 4 detik (BRD: Bisa dibatalkan).
+/// Simpan lewat controller, kembali ke tab, toast dengan "Batalkan" (BRD: Bisa dibatalkan).
 Future<void> simpanTransaksi(
   BuildContext context, {
   required JenisTransaksi jenis,
@@ -433,13 +430,7 @@ Future<void> simpanTransaksi(
     return;
   }
   nav.popUntil((r) => r.isFirst);
-  messenger.showSnackBar(
-    SnackBar(
-      content: const Text('Transaksi tersimpan'),
-      duration: const Duration(seconds: 4),
-      action: SnackBarAction(label: 'Batalkan', onPressed: () => c.hapus(id)),
-    ),
-  );
+  toastBatalkan(messenger, 'Transaksi tersimpan', () => c.hapus(id));
 }
 
 /// Pilihan jenis, gaya tab garis bawah (tokens .seg).

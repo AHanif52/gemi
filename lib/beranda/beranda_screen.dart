@@ -47,7 +47,7 @@ class BerandaScreen extends StatelessWidget {
         ],
       ),
       body: ListView(
-        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+        padding: const EdgeInsets.fromLTRB(24, 16, 24, 88), // 88: ruang FAB
         children: [
           if (budget != null && !budget.adaBudget)
             _HeroTanpaBudget(bulan: bulan)

@@ -9,6 +9,7 @@ import '../widgets/baris_gemi.dart';
 import '../widgets/hero_gemi.dart';
 import '../widgets/kosong_gemi.dart';
 import '../widgets/ribuan_formatter.dart';
+import '../widgets/toast.dart';
 import 'kantong_controller.dart';
 import '../app/database.dart' show Kantong;
 
@@ -65,14 +66,10 @@ class KantongDetailScreen extends StatelessWidget {
       );
       return;
     }
-    messenger.showSnackBar(
-      SnackBar(
-        content: Text(
-          'Selisih ${fmtRupiah((saldoRiil - saldoSekarang).abs())} dicatat',
-        ),
-        duration: const Duration(seconds: 4),
-        action: SnackBarAction(label: 'Batalkan', onPressed: () => c.hapus(id)),
-      ),
+    toastBatalkan(
+      messenger,
+      'Selisih ${fmtRupiah((saldoRiil - saldoSekarang).abs())} dicatat',
+      () => c.hapus(id),
     );
   }
 

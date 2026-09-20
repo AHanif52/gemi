@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../app/theme.dart';
+
 /// Keypad penuh 3x4 (prototipe `.kbd`). Tombol kosong ('') tidak digambar.
 /// Dipakai form nominal (000 di kiri bawah) dan layar PIN (kiri bawah kosong).
 class KeypadGemi extends StatelessWidget {
@@ -29,34 +31,50 @@ class KeypadGemi extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final surface2 = Theme.of(context).brightness == Brightness.dark
-        ? const Color(0xFF222925)
-        : const Color(0xFFF6F7F5);
-    return GridView.count(
-      crossAxisCount: 3,
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      mainAxisSpacing: 8,
-      crossAxisSpacing: 8,
-      childAspectRatio: 2.1,
-      children: [
-        for (final k in tombol)
-          if (k.isEmpty)
-            const SizedBox()
-          else
-            Material(
-              color: surface2,
-              borderRadius: BorderRadius.circular(6),
-              child: InkWell(
-                key: Key('$keyPrefix.$k'),
-                borderRadius: BorderRadius.circular(6),
-                onTap: () => onKetik(k),
-                child: Center(
-                  child: Text(k, style: const TextStyle(fontSize: 22)),
+    final surface2 = context.gemi.surface2;
+    // Column/Row, bukan GridView: butuh intrinsic height untuk KolomIsiLayar.
+    // Lebar maks 420 supaya di landscape/tablet tombol tidak raksasa.
+    return Center(
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 420),
+        child: Column(
+          children: [
+            for (var r = 0; r < tombol.length; r += 3)
+              Padding(
+                padding: EdgeInsets.only(top: r == 0 ? 0 : 8),
+                child: Row(
+                  children: [
+                    for (var i = r; i < r + 3; i++) ...[
+                      if (i > r) const SizedBox(width: 8),
+                      Expanded(
+                        child: AspectRatio(
+                          aspectRatio: 2.1,
+                          child: tombol[i].isEmpty
+                              ? const SizedBox()
+                              : Material(
+                                  color: surface2,
+                                  borderRadius: BorderRadius.circular(6),
+                                  child: InkWell(
+                                    key: Key('$keyPrefix.${tombol[i]}'),
+                                    borderRadius: BorderRadius.circular(6),
+                                    onTap: () => onKetik(tombol[i]),
+                                    child: Center(
+                                      child: Text(
+                                        tombol[i],
+                                        style: const TextStyle(fontSize: 22),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                        ),
+                      ),
+                    ],
+                  ],
                 ),
               ),
-            ),
-      ],
+          ],
+        ),
+      ),
     );
   }
 }
